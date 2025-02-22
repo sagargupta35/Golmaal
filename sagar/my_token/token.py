@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+TokenType = str
+
 @dataclass
 class Token:
-    token_type: str
+    token_type: TokenType
     literal: str
 
 @dataclass(frozen=True)
@@ -29,5 +31,3 @@ class Constants:
     # Keywords
     FUNCTION = "FUNCTION"
     LET = "LET"
-
-constants = Constants()
