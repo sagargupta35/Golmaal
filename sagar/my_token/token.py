@@ -31,3 +31,12 @@ class Constants:
     # Keywords
     FUNCTION = "FUNCTION"
     LET = "LET"
+
+
+keywords = {
+    'let': Constants.LET,
+    'fn': Constants.FUNCTION
+}
+
+def get_ident_type(ch: str) -> TokenType:
+    return keywords.get(ch, Constants.IDENT)
