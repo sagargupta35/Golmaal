@@ -8,10 +8,19 @@ class TestNextToken(unittest.TestCase):
         input = '''
             let five = 5;
             let ten = 10;
-            let add = fn(x, y){
-                x + y;
-            }
+            let add = fn(x, y) {
+            x + y;
+            };
             let result = add(five, ten);
+            !-/*5;
+            5 < 10 > 5;
+            if (5 < 10) {
+            return true;
+            } else {
+            return false;
+            }
+            10 == 10;
+            10 != 9;
         '''
         con = Constants()
 
@@ -21,11 +30,13 @@ class TestNextToken(unittest.TestCase):
             (con.ASSIGN, "="),
             (con.INT, "5"),
             (con.SEMICOLON, ";"),
+
             (con.LET, "let"),
             (con.IDENT, "ten"),
             (con.ASSIGN, "="),
             (con.INT, "10"),
             (con.SEMICOLON, ";"),
+
             (con.LET, "let"),
             (con.IDENT, "add"),
             (con.ASSIGN, "="),
@@ -36,11 +47,15 @@ class TestNextToken(unittest.TestCase):
             (con.IDENT, "y"),
             (con.RPAREN, ")"),
             (con.LBRACE, "{"),
+
             (con.IDENT, "x"),
             (con.PLUS, "+"),
             (con.IDENT, "y"),
             (con.SEMICOLON, ";"),
+
             (con.RBRACE, "}"),
+            (con.SEMICOLON, ";"),
+
             (con.LET, "let"),
             (con.IDENT, "result"),
             (con.ASSIGN, "="),
@@ -51,7 +66,52 @@ class TestNextToken(unittest.TestCase):
             (con.IDENT, "ten"),
             (con.RPAREN, ")"),
             (con.SEMICOLON, ";"),
-            (con.EOF, ""),
+
+            (con.BANG, "!"),
+            (con.MINUS, "-"),
+            (con.SLASH, "/"),
+            (con.ASTERISK, "*"),
+            (con.INT, "5"),
+            (con.SEMICOLON, ";"),
+
+            (con.INT, "5"),
+            (con.LT, "<"),
+            (con.INT, "10"),
+            (con.GT, ">"),
+            (con.INT, "5"),
+            (con.SEMICOLON, ";"),
+
+            (con.IF, "if"),
+            (con.LPAREN, "("),
+            (con.INT, "5"),
+            (con.LT, "<"),
+            (con.INT, "10"),
+            (con.RPAREN, ")"),
+            (con.LBRACE, "{"),
+
+            (con.RETURN, "return"),
+            (con.TRUE, "true"),
+            (con.SEMICOLON, ";"),
+
+            (con.RBRACE, "}"),
+            (con.ELSE, "else"),
+            (con.LBRACE, "{"),
+
+            (con.RETURN, "return"),
+            (con.FALSE, "false"),
+            (con.SEMICOLON, ";"),
+
+            (con.RBRACE, "}"),
+
+            (con.INT, "10"),
+            (con.EQ, "=="),
+            (con.INT, "10"),
+            (con.SEMICOLON, ";"),
+
+            (con.INT, "10"),
+            (con.NOT_EQ, "!="),
+            (con.INT, "9"),
+            (con.SEMICOLON, ";")
         ]
 
 

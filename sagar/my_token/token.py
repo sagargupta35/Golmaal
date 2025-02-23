@@ -19,6 +19,14 @@ class Constants:
     # Operators
     ASSIGN = "="
     PLUS = "+"
+    ASTERISK = "*"
+    GT = ">"
+    LT = "<"
+    SLASH = "/"
+    MINUS = "-"
+    BANG = "!"
+    EQ = "=="
+    NOT_EQ = "!="
 
     # Delimiters
     COMMA = ","
@@ -31,12 +39,29 @@ class Constants:
     # Keywords
     FUNCTION = "FUNCTION"
     LET = "LET"
+    RETURN = "RETURN"
+    TRUE = "TRUE"
+    FALSE = "FALSE"
+    IF = "IF"
+    ELSE = "ELSE"
 
+two_char_ops = {
+    '==': Constants.EQ,
+    '!=': Constants.NOT_EQ
+}
 
 keywords = {
     'let': Constants.LET,
-    'fn': Constants.FUNCTION
+    'fn': Constants.FUNCTION,
+    'true': Constants.TRUE,
+    'false': Constants.FALSE,
+    'if': Constants.IF,
+    'else': Constants.ELSE,
+    "return": Constants.RETURN
 }
+
+def get_two_char_type(ch: str) -> TokenType:
+    return two_char_ops.get(ch, Constants.ILLEGAL)
 
 def get_ident_type(ch: str) -> TokenType:
     return keywords.get(ch, Constants.IDENT)

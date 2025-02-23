@@ -18,11 +18,23 @@ class Lexer:
         self.position = self.read_position
         self.read_position += 1
 
+    def peek_char(self):
+        if self.read_position >= len(self.input):
+            return 0
+        else:
+            return self.input[self.read_position]
+
     def read_word(self) -> str:
         pos = self.position
-        while is_letter_or_digit(self.ch):
+        while is_letter_or_digit(self.peek_char()):
             self.read_char()
-        return self.input[pos:self.read_position-1]
+        return self.input[pos:self.read_position]
+    
+    def read_two_char(self) -> Token:
+        ch = self.ch
+        self.read_char()
+        two_char_tok_type = token.get_two_char_type(ch+self.ch)
+        return Token(two_char_tok_type, ch+self.ch)
 
     def next_token(self) -> Token:
         con = Constants()
@@ -32,7 +44,10 @@ class Lexer:
 
         match self.ch:
             case '=':
-                tok = Token(con.ASSIGN, '=')
+                if self.peek_char() == '=':
+                    tok = self.read_two_char()
+                else:
+                    tok = Token(con.ASSIGN, '=')
             case ';':
                 tok = Token(con.SEMICOLON, ';')
             case '(':
@@ -47,6 +62,21 @@ class Lexer:
                 tok = Token(con.LBRACE, '{')
             case '}':
                 tok = Token(con.RBRACE, '}')
+            case '!':
+                if self.peek_char() == '=':
+                    tok = self.read_two_char()
+                else:
+                    tok = Token(con.BANG, '!')
+            case '-':
+                tok = Token(con.MINUS, '-')
+            case '/':
+                tok = Token(con.SLASH, '/')
+            case '<':
+                tok = Token(con.LT, '<')
+            case '>':
+                tok = Token(con.GT, '>')
+            case '*':
+                tok = Token(con.ASTERISK, '*')
             case 0:
                 tok = Token(con.EOF, '')
             case _:
@@ -59,11 +89,11 @@ class Lexer:
                     else:
                         tok = Token(token.get_ident_type(word), word)
                 else:
-                    tok = Token(con.ILLEGAL, word)
-                return tok
-            
+                    tok = Token(con.ILLEGAL, self.ch)
+
         self.read_char()
         return tok
+
     
     def skip_whitespace(self):
         while self.ch == ' ' or self.ch == '\t' or self.ch == '\n' or self.ch == '\r':
