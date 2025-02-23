@@ -6,6 +6,8 @@ PROMPT = ">>"
 def start():
     while True:
         line = input(PROMPT)
+        if line == 'quit':
+            break
         l = Lexer.new_lexer(line)
         con = Constants()
 
