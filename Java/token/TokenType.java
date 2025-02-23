@@ -1,6 +1,9 @@
 // token/TokenType.java
 package token;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TokenType {
     public static final String ILLEGAL = "ILLEGAL";
     public static final String EOF = "EOF";
@@ -19,4 +22,12 @@ public class TokenType {
     public static final String RBRACE = "}";
     public static final String FUNCTION = "FUNCTION";
     public static final String LET = "LET";
+    private static final Map<String, String> keywords = new HashMap<>();
+    static {
+        keywords.put("let", LET);
+        keywords.put("fn", FUNCTION);
+    }
+    public static String getIdentType(String s){
+        return keywords.getOrDefault(s, IDENT);
+    }
 }
