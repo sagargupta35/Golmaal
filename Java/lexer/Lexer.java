@@ -25,8 +25,45 @@ public class Lexer {
         readPosition += 1;
     }
 
+    private String readWord(){
+        int pos=position;
+        while(isLetterOrDigit(ch)){
+            readChar();
+        }
+        return input.substring(pos,readPosition-1);
+    }
+
+    public void skipWhitespace(){
+        while(ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'){
+            readChar();
+        }
+    }
+    public boolean isLetterOrDigit(char ch){
+        if((ch >= 'a' && ch <= 'z')||(ch >='A' && ch <= 'Z')|| isDigit(ch) || ch == '_'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public boolean isDigit(char ch){
+        if(ch >= '0' && ch <= '9'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isNumber(String s){
+        for(int i=0;i<s.length();i++){
+            if(!isDigit(s.charAt(i))){
+                return false;
+            }
+        }
+        return true;
+    }
     public Token nextToken() {
         Token tok;
+        skipWhitespace();
         switch (ch) {
             case '=':
                 tok = new Token(TokenType.ASSIGN, String.valueOf(ch));
@@ -56,18 +93,32 @@ public class Lexer {
                 tok = new Token(TokenType.EOF, "");
                 break;
             default:
-                tok = new Token(TokenType.ILLEGAL, String.valueOf(ch));
+                if(isLetterOrDigit(ch)){
+                    String word=readWord();
+                    // System.out.println(word);
+                    if(isNumber(word)){
+                       tok=new Token(TokenType.INT,word); 
+                    }else if(isDigit(word.charAt(0))){
+                        tok=new Token(TokenType.ILLEGAL,word);
+                    }else{
+                        tok=new Token(TokenType.getIdentType(word),word);
+                    }
+                }else{
+                    tok = new Token(TokenType.ILLEGAL, String.valueOf(ch));
+                }
+                return tok;
         }
-        readChar();
-        return tok;
-    }
+            readChar();
+            return tok;
+        }
+
     public static void main(String[] args) {
-        String input="=+(){},;";
+        String input="let five = 5;";
         Lexer obj=new Lexer(input);
         for(int i=0;i<input.length();i++){
             Token x=obj.nextToken();
             if(x.type.equals("ILLEGAL")){
-                System.out.println(i+" "+"wefneskjhgfishgkiebshkigbibrskdjgkdfjbgkdfnhbg");
+                System.out.println(i+" "+"wenjydwmye");
             }else{
 
                 System.out.println(x.type+" "+x.literal);
