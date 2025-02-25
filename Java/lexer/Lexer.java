@@ -55,10 +55,10 @@ public class Lexer {
             return false;
         }
     }
-    // public char peek(){
-    //     if(readPosition >= input.length()) return 0;
-    //     return input.charAt(readPosition);
-    // }
+    public char peek(){
+        if(readPosition >= input.length()) return 0;
+        return input.charAt(readPosition);
+    }
     public boolean isNumber(String s){
         for(int i=0;i<s.length();i++){
             if(!isDigit(s.charAt(i))){
@@ -72,7 +72,14 @@ public class Lexer {
         skipWhitespace();
         switch (ch) {
             case '=':
-                tok = new Token(TokenType.ASSIGN, String.valueOf(ch));
+                if(peek() == '='){
+                    char firstLetter=ch;
+                    readChar();
+                    tok = new Token(TokenType.EQ, String.valueOf(""+firstLetter+ch));
+                }else{
+                    tok = new Token(TokenType.ASSIGN, String.valueOf(ch));
+                }
+
                 break;
             case '+':
                 tok = new Token(TokenType.PLUS, String.valueOf(ch));
@@ -94,6 +101,30 @@ public class Lexer {
                 break;
             case ';':
                 tok = new Token(TokenType.SEMICOLON, String.valueOf(ch));
+                break;
+            case '-':
+                tok = new Token(TokenType.MINUS, String.valueOf(ch));
+                break;
+            case '*':
+                tok = new Token(TokenType.ASTERISK, String.valueOf(ch));
+                break;
+            case '!':
+                if(peek() == '='){
+                    char firstLetter=ch;
+                    readChar();
+                    tok = new Token(TokenType.NOT_EQ, String.valueOf(""+firstLetter+ch));
+                }else{
+                    tok = new Token(TokenType.BANG, String.valueOf(ch));
+                }
+                break;
+            case '<':
+                tok = new Token(TokenType.LT, String.valueOf(ch));
+                break;
+            case '>':
+                tok = new Token(TokenType.GT, String.valueOf(ch));
+                break; 
+            case '/':
+                tok = new Token(TokenType.LT, String.valueOf(ch));
                 break;
             case 0:
                 tok = new Token(TokenType.EOF, "");
@@ -119,7 +150,24 @@ public class Lexer {
         }
 
     public static void main(String[] args) {
-        String input="let five = 5 ; (* ";
+        String input = """
+                        let five = 5;
+                        let ten = 10;
+                        let add = fn(x, y) {
+                        x + y;
+                        };
+                        let result = add(five, ten);
+                        !-/*5;
+                        5 < 10 > 5;
+                        if (5 < 10) {
+                        return true;
+                        } else {
+                        return false;
+                        }
+                        10 == 10;
+                        10 != 9;
+                    """;
+
         Lexer obj=new Lexer(input);
         while (true) {
             Token x = obj.nextToken();
