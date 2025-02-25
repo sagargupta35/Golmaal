@@ -1,16 +1,15 @@
+
 # main.py
-from mylexer.lexer import Lexer
-from mytoken.tokentype import TokenType
+import os
+from Aviral.myrepl.repl import repl
 
 def main():
-    input_str = "=+(){},;"
-    lexer = Lexer(input_str)
+    user_name = os.getlogin()
 
-    while True:
-        tok = lexer.next_token()
-        print(f"Type: {tok.type}, Literal: '{tok.literal}'")
-        if tok.type == TokenType.EOF:
-            break
+    print(f"Hello {user_name}! This is the Monkey programming language!")
+    print("Feel free to type in commands")
+
+    repl.start()
 
 if __name__ == "__main__":
     main()
