@@ -1,6 +1,6 @@
 import unittest
-from mylexer.lexer import Lexer
-from mytoken.tokentype import TokenType
+from Aviral.mylexer.lexer import Lexer
+from Aviral.mytoken.tokentype import TokenType
 
 class TestLexer(unittest.TestCase):
     def test_next_token(self):
