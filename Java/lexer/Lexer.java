@@ -27,10 +27,13 @@ public class Lexer {
 
     private String readWord(){
         int pos=position;
-        while(isLetterOrDigit(ch)){
-            readChar();
-        }
-        return input.substring(pos,readPosition-1);
+       
+            while(isLetterOrDigit(ch)){
+                readChar();
+            }
+        
+
+        return input.substring(pos,position);
     }
 
     public void skipWhitespace(){
@@ -52,7 +55,10 @@ public class Lexer {
             return false;
         }
     }
-
+    // public char peek(){
+    //     if(readPosition >= input.length()) return 0;
+    //     return input.charAt(readPosition);
+    // }
     public boolean isNumber(String s){
         for(int i=0;i<s.length();i++){
             if(!isDigit(s.charAt(i))){
@@ -113,15 +119,16 @@ public class Lexer {
         }
 
     public static void main(String[] args) {
-        String input="let five = 5;";
+        String input="let five = 5 ; (* ";
         Lexer obj=new Lexer(input);
-        for(int i=0;i<input.length();i++){
-            Token x=obj.nextToken();
-            if(x.type.equals("ILLEGAL")){
-                System.out.println(i+" "+"wenjydwmye");
-            }else{
-
-                System.out.println(x.type+" "+x.literal);
+        while (true) {
+            Token x = obj.nextToken();
+            if (x.type.equals("EOF")) break;
+            if (x.type.equals("ILLEGAL")) {
+                System.out.println("ILLEGAL token at: " + x.literal);
+                break;
+            } else {
+                System.out.println(x.type + " " + x.literal);
             }
         }
         System.out.println();
