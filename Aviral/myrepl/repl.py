@@ -1,7 +1,7 @@
 # repl/repl.py
-from mylexer.lexer import Lexer
-from mytoken.token import Token
-from mytoken.tokentype import TokenType
+from Aviral.mylexer.lexer import Lexer
+from Aviral.mytoken.token import Token
+from Aviral.mytoken.tokentype import TokenType
 PROMPT = ">> "
 
 def start():

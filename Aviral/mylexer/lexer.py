@@ -1,6 +1,6 @@
 # lexer/lexer.py
-from mytoken.token import Token
-from mytoken.tokentype import TokenType
+from Aviral.mytoken.token import Token
+from Aviral.mytoken.tokentype import TokenType
 
 class Lexer:
     def __init__(self, input_str):
