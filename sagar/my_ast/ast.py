@@ -8,12 +8,12 @@ class Node(ABC):
 
 class Statement(Node):
     @abstractmethod
-    def statementNode(self):
+    def statement_node(self):
         pass
 
 class Expression(Node):
     @abstractmethod
-    def expressionNode(self):
+    def expression_node(self):
         pass
 
 class Program(Node):
@@ -34,20 +34,20 @@ class Identifier(Expression):
     def token_literal(self) -> str:
         return self.token.literal
 
-    def expressionNode(self):
+    def expression_node(self):
         pass
 
 
 class LetStatement(Statement):
     def __init__(self, token: Token, name: Identifier, value: Expression):
-        self.token = token
-        self.name = name
-        self.value = value
+        self.token: Token = token
+        self.name: Identifier = name
+        self.value: Expression = value
     
-    def token_literal(self):
+    def token_literal(self) -> str:
         return self.token.literal
     
-    def statementNode(self):
+    def statement_node(self):
         pass
 
 
