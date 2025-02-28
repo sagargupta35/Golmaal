@@ -50,4 +50,15 @@ class LetStatement(Statement):
     def statement_node(self):
         pass
 
+class ReturnStatement(Statement):
+    def __init__(self, token: Token, value: Expression):
+        self.token = token
+        self.value = value
+
+    def token_literal(self):
+        return self.token.literal
+    
+    def statement_node(self):
+        return
+
 
