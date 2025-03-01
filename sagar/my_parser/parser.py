@@ -1,6 +1,11 @@
 from sagar.lexer.Lexer import Lexer
 from sagar.my_token.token import Token, Constants, TokenType
 from sagar.my_ast.ast import *
+from typing import Callable
+
+prefix_parsing_fn = Callable[[], Expression]
+infix_parsing_fn = Callable[[Expression], Expression]
+
 
 class Parser:
     def __init__(self, lexer: Lexer):
@@ -8,6 +13,8 @@ class Parser:
         self.cur_token: Token = lexer.next_token()
         self.peek_token: Token = lexer.next_token()
         self.errors: list[str] = []
+        self.prefix_parsing_fns: dict[TokenType, prefix_parsing_fn] = {}
+        self.infix_parsing_fns: dict[TokenType, infix_parsing_fn] = {}
 
     def next_token(self):
         self.cur_token = self.peek_token
@@ -70,6 +77,8 @@ class Parser:
         return rt_stmt
 
     
+
+
     def expect_peek(self, token_type: TokenType) -> bool:
         if self.peek_token.token_type == token_type:
             self.next_token()

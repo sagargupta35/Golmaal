@@ -61,4 +61,14 @@ class ReturnStatement(Statement):
     def statement_node(self):
         return
 
+class ExpressionStatement(Statement):
+    def __nit__(self, token: Token, expression: Expression):
+        self.token = token
+        self.expression = expression
+
+    def token_literal(self):
+        return self.token.literal
+    
+    def statement_node(self):
+        return
 

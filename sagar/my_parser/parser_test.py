@@ -1,7 +1,7 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement
+from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier
 
 class TestParser(unittest.TestCase):
     def test_let_statement(self):
@@ -52,6 +52,30 @@ class TestParser(unittest.TestCase):
         for i, stmt in enumerate(program.statements):
             self.assertTrue(stmt.token_literal() == 'return', f"Expected return as token_literal. But found {stmt.token_literal()}")
             self.assertTrue(isinstance(stmt, ReturnStatement), f"stmt {i} is not an instance of ReturnStatment")
+
+
+    def test_identifier_expression(self):
+        input = 'foobar;'
+
+        l = new_lexer(input)
+        p = Parser(lexer=l)
+
+        program = p.parse_program()
+        self.check_parse_errors(p)
+
+        self.assertTrue(program != None, "p.parse_program() returned null.")
+        self.assertTrue(len(program.statements) == 1, f"Expected 1 statement. But found {len(program.statements)} statements")
+
+        stmt = program.statements[0]
+        self.assertTrue(isinstance(stmt, Statement), f"stmt is not an instance of Statement. It is a {type(stmt)}")
+
+        exp_stmt: ExpressionStatement = stmt
+        self.assertTrue(isinstance(exp_stmt.expression, Identifier), f"exp_stmt.expression is not an instance of Identifier. It is a {type(exp_stmt.expression)}")
+        iden = exp_stmt.expression
+
+        self.assertTrue(iden.value == 'foobar', f"iden.value is not 'foobar'. Found {iden.value}")
+        self.assertTrue(iden.token_literal() == 'foobar', f"iden.token_literal() is not 'foobar'. Found {iden.token_literal()}")
+        
 
 
     def check_parse_errors(self, p: Parser):
