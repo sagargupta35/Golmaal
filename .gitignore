@@ -1,16 +1,49 @@
-# Ignore Python cache files
+# Ignore compiled class files
+*.class
+
+# Ignore log files and temporary files
+*.log
+*.tmp
+
+# Ignore JAR and WAR files
+*.jar
+*.war
+
+# Ignore generated build directories
+/build/
+/out/
+/target/
+/bin/
+
+# Ignore Maven or Gradle specific files
+/.mvn/
+/.gradle/
+/.idea/modules.xml
+.idea/workspace.xml
+.idea/libraries/
+.idea/shelf/
+/.idea/sonarlint/
+/.idea/vcs.xml
+.idea/httpRequests/
+
+# Ignore Eclipse specific files (if applicable)
+*.launch
+.settings/
+.metadata/
+.classpath
+.project
+
+# Ignore dependency directories
+/node_modules/
+/lib/
+/vendor/
+
+# Ignore Python cache files (already present)
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Ignore virtual environments (if any)
-venv/
-env/
-
 # Ignore IDE-specific files
 .vscode/
 .idea/
-
-# Ignore system files
-.DS_Store

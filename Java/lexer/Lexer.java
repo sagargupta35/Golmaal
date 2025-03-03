@@ -122,9 +122,9 @@ public class Lexer {
                 break;
             case '>':
                 tok = new Token(TokenType.GT, String.valueOf(ch));
-                break; 
+                break;
             case '/':
-                tok = new Token(TokenType.LT, String.valueOf(ch));
+                tok = new Token(TokenType.SLASH, String.valueOf(ch));
                 break;
             case 0:
                 tok = new Token(TokenType.EOF, "");
