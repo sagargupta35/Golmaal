@@ -7,6 +7,14 @@ prefix_parsing_fn = Callable[[], Expression]
 infix_parsing_fn = Callable[[Expression], Expression]
 
 
+LOWEST = 1
+EQUALS = 2
+LESSGREATER = 3
+SUM = 4
+PRODUCT = 5
+PREFIX = 6
+CALL = 7
+
 class Parser:
     def __init__(self, lexer: Lexer):
         self.lexer = lexer
@@ -15,6 +23,10 @@ class Parser:
         self.errors: list[str] = []
         self.prefix_parsing_fns: dict[TokenType, prefix_parsing_fn] = {}
         self.infix_parsing_fns: dict[TokenType, infix_parsing_fn] = {}
+
+        self.prefix_parsing_fns[Constants.IDENT] = self.parse_identifier
+        self.prefix_parsing_fns[Constants.INT] = self.parse_integer_literal
+
 
     def next_token(self):
         self.cur_token = self.peek_token
@@ -43,7 +55,8 @@ class Parser:
                 rt_stmt = self.parse_return_statement()
                 return rt_stmt
             case _:
-                return None
+                exp_stmt = self.parse_expression_statement()
+                return exp_stmt
             
     def parse_let_statement(self) -> Statement:
         letstmt = LetStatement(token=self.cur_token, name = None, value = None)
@@ -76,9 +89,6 @@ class Parser:
             self.next_token()
         return rt_stmt
 
-    
-
-
     def expect_peek(self, token_type: TokenType) -> bool:
         if self.peek_token.token_type == token_type:
             self.next_token()
@@ -90,6 +100,37 @@ class Parser:
     def peek_error(self, token_type: TokenType):
         msg = f"Expected '{token_type}'. But found '{self.peek_token.token_type}'"
         self.errors.append(msg)
+
+
+    def parse_expression_statement(self) -> Statement:
+        exp_stmt = ExpressionStatement(token = self.cur_token, expression = None)
+
+        exp_stmt.expression = self.parse_expression(LOWEST)
+
+        if self.peek_token.token_type == Constants.SEMICOLON:
+            self.next_token()
+        
+        return exp_stmt
+    
+    def parse_expression(self, precedent: int) -> Expression:
+        prefix = self.prefix_parsing_fns[self.cur_token.token_type]
+
+        if prefix == None:
+            return None
+        
+        left_exp = prefix()
+        return left_exp
+    
+    def parse_identifier(self) -> Expression:
+        return Identifier(token = self.cur_token, value = self.cur_token.literal)
+    
+    def parse_integer_literal(self) -> Expression:
+        try:
+            return IntegerLiteral(token= self.cur_token, value=int(self.cur_token.literal))
+        except (ValueError, TypeError):
+            return None
+
+
 
 
 

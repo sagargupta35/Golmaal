@@ -1,7 +1,7 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier
+from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral
 
 class TestParser(unittest.TestCase):
     def test_let_statement(self):
@@ -67,7 +67,7 @@ class TestParser(unittest.TestCase):
         self.assertTrue(len(program.statements) == 1, f"Expected 1 statement. But found {len(program.statements)} statements")
 
         stmt = program.statements[0]
-        self.assertTrue(isinstance(stmt, Statement), f"stmt is not an instance of Statement. It is a {type(stmt)}")
+        self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an instance of Statement. It is a {type(stmt)}")
 
         exp_stmt: ExpressionStatement = stmt
         self.assertTrue(isinstance(exp_stmt.expression, Identifier), f"exp_stmt.expression is not an instance of Identifier. It is a {type(exp_stmt.expression)}")
@@ -75,8 +75,31 @@ class TestParser(unittest.TestCase):
 
         self.assertTrue(iden.value == 'foobar', f"iden.value is not 'foobar'. Found {iden.value}")
         self.assertTrue(iden.token_literal() == 'foobar', f"iden.token_literal() is not 'foobar'. Found {iden.token_literal()}")
-        
 
+    
+    def test_integer_literals(self):
+        input = '''
+            5;
+            9379;
+        '''
+
+        values = [5, 9379]
+
+        l = new_lexer(input=input)
+        p = Parser(l)
+
+        program = p.parse_program()
+        self.assertTrue(program != None, "p.parse_program() returned None")
+        self.assertTrue(len(program.statements) == 2, f"Expected 2 statments. But found {len(program.statements)}")
+
+        for i, stmt in enumerate(program.statements):
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt {i} is not an Expression statment. Its a {type(stmt)}")
+            exp_stmt: ExpressionStatement = stmt
+            self.assertTrue(isinstance(exp_stmt.expression, IntegerLiteral), f"exp_stmt.expression is not an IntegerLiteral. Its a {type(exp_stmt.expression)}")
+            exp: IntegerLiteral = exp_stmt.expression
+            self.assertTrue(exp.value == values[i], f"exp.value != {values[i]}. Its {exp.value}")
+            self.assertTrue(exp.token_literal() == f"{values[i]}", f'exp.token_literal() != "{values[i]}". It is {exp.token_literal()}')
+            
 
     def check_parse_errors(self, p: Parser):
         errors = p.errors
@@ -93,7 +116,5 @@ class TestParser(unittest.TestCase):
 
     
 
-
-
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main() 

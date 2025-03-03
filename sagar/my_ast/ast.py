@@ -62,7 +62,7 @@ class ReturnStatement(Statement):
         return
 
 class ExpressionStatement(Statement):
-    def __nit__(self, token: Token, expression: Expression):
+    def __init__(self, token: Token, expression: Expression):
         self.token = token
         self.expression = expression
 
@@ -71,4 +71,19 @@ class ExpressionStatement(Statement):
     
     def statement_node(self):
         return
+    
+class IntegerLiteral(Expression):
+    def __init__(self, token: Token, value: int):
+        self.token = token
+        self.value = value
+
+    def expression_node(self):
+        pass
+
+    def token_literal(self):
+        return self.token.literal
+    
+
+
+
 
