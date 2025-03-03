@@ -112,7 +112,7 @@ class Parser:
         
         return exp_stmt
     
-    def parse_expression(self, precedent: int) -> Expression:
+    def parse_expression(self, precedence: int) -> Expression:
         prefix = self.prefix_parsing_fns.get(self.cur_token.token_type)
 
         if prefix == None:
