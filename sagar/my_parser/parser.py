@@ -113,9 +113,10 @@ class Parser:
         return exp_stmt
     
     def parse_expression(self, precedent: int) -> Expression:
-        prefix = self.prefix_parsing_fns[self.cur_token.token_type]
+        prefix = self.prefix_parsing_fns.get(self.cur_token.token_type)
 
         if prefix == None:
+            self.errors.append(f"no prefix parsing function found for {self.cur_token.token_type}")
             return None
         
         left_exp = prefix()

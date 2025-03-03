@@ -1,17 +1,17 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral
+from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, Expression
 
 class TestParser(unittest.TestCase):
     def test_let_statement(self):
-        input = '''
+        inp = '''
             let five = 5;
             let ten = 10;
             let foobar = 838383;
         '''
 
-        l = new_lexer(input)
+        l = new_lexer(inp)
         p = Parser(lexer= l)
 
         identifiers = ['five', 'ten', 'foobar']
@@ -34,13 +34,13 @@ class TestParser(unittest.TestCase):
 
 
     def test_return_statement(self):
-        input = '''
+        inp = '''
             return 10;
             return 5;
             return 342934923;
         '''
 
-        l = new_lexer(input)
+        l = new_lexer(inp)
         p = Parser(lexer=l)
 
         program = p.parse_program()
@@ -55,9 +55,9 @@ class TestParser(unittest.TestCase):
 
 
     def test_identifier_expression(self):
-        input = 'foobar;'
+        inp = 'foobar;'
 
-        l = new_lexer(input)
+        l = new_lexer(inp)
         p = Parser(lexer=l)
 
         program = p.parse_program()
@@ -78,17 +78,18 @@ class TestParser(unittest.TestCase):
 
     
     def test_integer_literals(self):
-        input = '''
+        inp = '''
             5;
             9379;
         '''
 
         values = [5, 9379]
 
-        l = new_lexer(input=input)
+        l = new_lexer(input=inp)
         p = Parser(l)
 
         program = p.parse_program()
+        self.check_parse_errors(p)
         self.assertTrue(program != None, "p.parse_program() returned None")
         self.assertTrue(len(program.statements) == 2, f"Expected 2 statments. But found {len(program.statements)}")
 
@@ -99,7 +100,35 @@ class TestParser(unittest.TestCase):
             exp: IntegerLiteral = exp_stmt.expression
             self.assertTrue(exp.value == values[i], f"exp.value != {values[i]}. Its {exp.value}")
             self.assertTrue(exp.token_literal() == f"{values[i]}", f'exp.token_literal() != "{values[i]}". It is {exp.token_literal()}')
+
+    def test_prefix_expression(self):
+        prefix_exps = [("!5;", "!", 5), ("-15;", "-", 15)]
+
+        for inp, op, int_val in prefix_exps:
+            l = new_lexer(input=inp)
+            p = Parser(lexer= l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            self.assertTrue(len(program.statements) == 1, f"Length of program.statments != 1. Its {len(program.statements)}")
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an instance of ExpressionStatement. Its a {type(stmt)}")
+            exp_stmt: ExpressionStatement = stmt
             
+            self.assertTrue(isinstance(exp_stmt.expression, PrefixExpression), f"exp_stmt.expression is not an instance of PrefixExpression. Its a {type(exp_stmt.expression)}")
+            exp: PrefixExpression = exp_stmt.expression
+
+            self.assertTrue(exp.operator == op, f"exp.operator != {op}. Its {exp.operator}")
+            self.validate_integer_literal(exp.right, int_val)
+
+    def validate_integer_literal(self, right: Expression, int_val: int):
+        self.assertTrue(isinstance(right, IntegerLiteral), f'right is a {type(right)}. Not an IntegerLiteral.')
+        il: IntegerLiteral = right
+        self.assertTrue(il.value == int_val, f"il.value is {il.value} != {int_val}")
+        self.assertTrue(il.token_literal() == int_val, f"il.token_literal() is {il.token_literal()} != {int_val}")
+
 
     def check_parse_errors(self, p: Parser):
         errors = p.errors
