@@ -43,3 +43,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
