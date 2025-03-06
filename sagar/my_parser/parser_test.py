@@ -123,7 +123,6 @@ class TestParser(unittest.TestCase):
             self.assertTrue(exp.operator == op, f"exp.operator != {op}. Its {exp.operator}")
             self.validate_integer_literal(exp.right, int_val)
 
-
     def test_infix_expression(self):
         infix_tests = [
             ("5 + 5;", 5, "+", 5),
@@ -156,7 +155,6 @@ class TestParser(unittest.TestCase):
             self.validate_integer_literal(right=inf_stmt.left, int_val=left)
             self.assertTrue(inf_stmt.operator == op, f"inf_stmt{i}.operator == {inf_stmt.operator} != {op}")
             self.validate_integer_literal(right= inf_stmt.right, int_val=right)
-
 
 
     def validate_integer_literal(self, right: Expression, int_val: int):
