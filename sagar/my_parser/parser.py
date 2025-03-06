@@ -42,6 +42,16 @@ class Parser:
         self.prefix_parsing_fns[Constants.BANG] = self.parse_prefix_expression
         self.prefix_parsing_fns[Constants.MINUS] = self.parse_prefix_expression
 
+        infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
+        for infix_op in infix_ops:
+            self.infix_parsing_fns[infix_op] = self.parse_infix_expression
+
+    def peek_precedence(self):
+        return precedences.get(self.peek_token.token_type, LOWEST)
+    
+    def cur_precedence(self):
+        return precedences.get(self.cur_token.token_type, LOWEST)
+
     def next_token(self):
         self.cur_token = self.peek_token
         self.peek_token = self.lexer.next_token()
@@ -134,7 +144,26 @@ class Parser:
             return None
         
         left_exp = prefix()
+
+        while self.peek_token != Constants.SEMICOLON and self.peek_precedence() > precedence:
+            infix = self.infix_parsing_fns[self.peek_token.token_type]
+
+            if infix == None:
+                return left_exp
+            
+            self.next_token()
+            left_exp = infix(left_exp)
+        
         return left_exp
+    
+    def parse_infix_expression(self, left: Expression) -> Expression:
+        inf_exp = InfixExpression(token=self.cur_token, left= left, operator=self.cur_token.literal, right= None)
+        cur_precedence = self.cur_precedence()
+        self.next_token()
+        right = self.parse_expression(precedence=cur_precedence)
+        inf_exp.right = right
+        return inf_exp
+
     
     def parse_identifier(self) -> Expression:
         return Identifier(token = self.cur_token, value = self.cur_token.literal)

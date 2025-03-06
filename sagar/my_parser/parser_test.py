@@ -150,8 +150,8 @@ class TestParser(unittest.TestCase):
             self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt {i} is not an ExpressionStatement. Its a {type(stmt)}")
             exp_stmt: ExpressionStatement = stmt
 
-            self.assertTrue(isinstance(stmt, InfixExpression), f"stmt {i} is not an InfixExpression. Its a {type(stmt)}")
-            inf_stmt: InfixExpression = exp_stmt
+            self.assertTrue(isinstance(exp_stmt.expression, InfixExpression), f"exp_stmt {i} is not an InfixExpression. Its a {type(stmt)}")
+            inf_stmt: InfixExpression = exp_stmt.expression
 
             self.validate_integer_literal(right=inf_stmt.left, int_val=left)
             self.assertTrue(inf_stmt.operator == op, f"inf_stmt{i}.operator == {inf_stmt.operator} != {op}")
