@@ -23,10 +23,13 @@ class Parser:
         self.errors: list[str] = []
         self.prefix_parsing_fns: dict[TokenType, prefix_parsing_fn] = {}
         self.infix_parsing_fns: dict[TokenType, infix_parsing_fn] = {}
+        self.__register_paring_fns()
 
+    def __register_paring_fns(self):
         self.prefix_parsing_fns[Constants.IDENT] = self.parse_identifier
         self.prefix_parsing_fns[Constants.INT] = self.parse_integer_literal
-
+        self.prefix_parsing_fns[Constants.BANG] = self.parse_prefix_expression
+        self.prefix_parsing_fns[Constants.MINUS] = self.parse_prefix_expression
 
     def next_token(self):
         self.cur_token = self.peek_token
@@ -130,6 +133,14 @@ class Parser:
             return IntegerLiteral(token= self.cur_token, value=int(self.cur_token.literal))
         except (ValueError, TypeError):
             return None
+        
+    def parse_prefix_expression(self) -> Expression:
+        expression = PrefixExpression(token= self.cur_token, operator=self.cur_token.literal, right= None)
+        self.next_token() # consume the operator
+        expression.right = self.parse_expression(precedence=PREFIX)
+        return expression
+
+
 
 
 

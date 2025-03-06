@@ -127,7 +127,7 @@ class TestParser(unittest.TestCase):
         self.assertTrue(isinstance(right, IntegerLiteral), f'right is a {type(right)}. Not an IntegerLiteral.')
         il: IntegerLiteral = right
         self.assertTrue(il.value == int_val, f"il.value is {il.value} != {int_val}")
-        self.assertTrue(il.token_literal() == int_val, f"il.token_literal() is {il.token_literal()} != {int_val}")
+        self.assertTrue(il.token_literal() == str(int_val), f"il.token_literal() is {il.token_literal()} != {int_val}")
 
 
     def check_parse_errors(self, p: Parser):
@@ -140,7 +140,7 @@ class TestParser(unittest.TestCase):
 
         for i, error in enumerate(errors):
             print(f"Error {i}: {error}")
-        
+
         self.fail()
 
     
