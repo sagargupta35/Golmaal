@@ -97,6 +97,18 @@ class PrefixExpression(Expression):
         pass
 
 
+class InfixExpression(Expression):
+    def __init__(self, token, left: Expression, operator, right: Expression):
+        self.left = left
+        self.token = token
+        self.operator = operator
+        self.right = right
+
+    def token_literal(self):
+        return self.token.literal
+    
+    def expression_node(self):
+        return None
 
 
 

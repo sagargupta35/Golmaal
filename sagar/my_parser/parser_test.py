@@ -1,7 +1,7 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, Expression
+from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, Expression, InfixExpression
 
 class TestParser(unittest.TestCase):
     def test_let_statement(self):
@@ -122,6 +122,42 @@ class TestParser(unittest.TestCase):
 
             self.assertTrue(exp.operator == op, f"exp.operator != {op}. Its {exp.operator}")
             self.validate_integer_literal(exp.right, int_val)
+
+
+    def test_infix_expression(self):
+        infix_tests = [
+            ("5 + 5;", 5, "+", 5),
+            ("5 - 5;", 5, "-", 5),
+            ("5 * 5;", 5, "*", 5),
+            ("5 / 5;", 5, "/", 5),
+            ("5 > 5;", 5, ">", 5),
+            ("5 < 5;", 5, "<", 5),
+            ("5 == 5;", 5, "==", 5),
+            ("5 != 5;", 5, "!=", 5),
+        ]
+
+        for i, tt in enumerate(infix_tests):
+            inp, left, op, right = tt
+            l = new_lexer(inp)
+            p = Parser(l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+            self.assertTrue(len(program.statements) == 1, f"len(program.statement) = {len(program.statements)} != 1")
+
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt {i} is not an ExpressionStatement. Its a {type(stmt)}")
+            exp_stmt: ExpressionStatement = stmt
+
+            self.assertTrue(isinstance(stmt, InfixExpression), f"stmt {i} is not an InfixExpression. Its a {type(stmt)}")
+            inf_stmt: InfixExpression = exp_stmt
+
+            self.validate_integer_literal(right=inf_stmt.left, int_val=left)
+            self.assertTrue(inf_stmt.operator == op, f"inf_stmt{i}.operator == {inf_stmt.operator} != {op}")
+            self.validate_integer_literal(right= inf_stmt.right, int_val=right)
+
+
 
     def validate_integer_literal(self, right: Expression, int_val: int):
         self.assertTrue(isinstance(right, IntegerLiteral), f'right is a {type(right)}. Not an IntegerLiteral.')

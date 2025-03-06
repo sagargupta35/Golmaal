@@ -15,6 +15,17 @@ PRODUCT = 5
 PREFIX = 6
 CALL = 7
 
+precedences: dict[TokenType, int] = {
+    Constants.EQ: EQUALS,
+    Constants.NOT_EQ: EQUALS,
+    Constants.LT: LESSGREATER,
+    Constants.GT: LESSGREATER,
+    Constants.PLUS: SUM,
+    Constants.MINUS: SUM,
+    Constants.SLASH: PRODUCT,
+    Constants.ASTERISK: PRODUCT,
+}
+
 class Parser:
     def __init__(self, lexer: Lexer):
         self.lexer = lexer
