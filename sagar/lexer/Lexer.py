@@ -26,7 +26,7 @@ class Lexer:
 
     def read_word(self) -> str:
         pos = self.position
-        while is_letter_or_digit(self.peek_char()):
+        while self.peek_char() != 0 and is_letter_or_digit(self.peek_char()):
             self.read_char()
         return self.input[pos:self.read_position]
     

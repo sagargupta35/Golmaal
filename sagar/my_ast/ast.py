@@ -24,7 +24,7 @@ class Program(Node):
         res = []
         for statement in self.statements:
             res.append(str(statement))
-        return ' '.join(res)
+        return ''.join(res)
     
     def token_literal(self) -> str:
         if len(self.statements):
@@ -55,9 +55,9 @@ class LetStatement(Statement):
 
     def __str__(self) -> str:
         res: list[str] = []
-        res.append('let ')
+        res.append('let')
         res.append(self.name)
-        res.append(' = ')
+        res.append('=')
         if self.value:
             res.append(str(self.value))
         return ' '.join(res)
@@ -75,7 +75,7 @@ class ReturnStatement(Statement):
 
     def __str__(self) -> str:
         res = []
-        res.append('return ')
+        res.append('return')
         if self.value:
             res.append(str(self.value))
         return ' '.join(res)
@@ -129,7 +129,7 @@ class PrefixExpression(Expression):
         res.append(self.operator)
         res.append(str(self.right))
         res.append(')')
-        return ' '.join(res)
+        return ''.join(res)
 
 
     def token_literal(self):
@@ -149,11 +149,11 @@ class InfixExpression(Expression):
     def __str__(self):
         res = []
         res.append('(')
-        res.append(str(self.left))
-        res.append(str(self.operator))
+        res.append(str(self.left) + ' ')
+        res.append(str(self.operator) + ' ')
         res.append(str(self.right))
         res.append(')')
-        return ' '.join(res)
+        return ''.join(res)
 
     def token_literal(self):
         return self.token.literal

@@ -156,6 +156,21 @@ class TestParser(unittest.TestCase):
             self.assertTrue(inf_stmt.operator == op, f"inf_stmt{i}.operator == {inf_stmt.operator} != {op}")
             self.validate_integer_literal(right= inf_stmt.right, int_val=right)
 
+    def test_operator_precedence(self):
+        tests = [( "-a * b", "((-a) * b)"), ("!-a", "(!(-a))"), ("a + b + c", "((a + b) + c)"),\
+                  ("a + b- c", "((a + b) - c)"), ("a * b * c", "((a * b) * c)"), ("a * b / c", "((a * b) / c)"),\
+                    ("a + b / c", "(a + (b / c))"), ("a + b * c + d / e- f", "(((a + (b * c)) + (d / e)) - f)"),\
+                     ("3 + 4;-5 * 5", "(3 + 4)((-5) * 5)"), ("5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"),\
+                      ("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"),\
+                       ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),\
+                        ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))")]
+
+        for inp, expexted in tests:
+            l = new_lexer(inp)
+            p = Parser(l)
+            program = p.parse_program()
+            self.check_parse_errors(p)
+            self.assertTrue(str(program) == expexted, f"expected {expexted}. But got {str(program)}")
 
     def validate_integer_literal(self, right: Expression, int_val: int):
         self.assertTrue(isinstance(right, IntegerLiteral), f'right is a {type(right)}. Not an IntegerLiteral.')
