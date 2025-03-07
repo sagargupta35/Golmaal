@@ -108,6 +108,8 @@ class TestParser(unittest.TestCase):
             self.validate_integer_literal(exp, expected)
         elif isinstance(expected, str):
             self.validate_identifier_expression(exp, expected)
+        elif isinstance(expected, bool):
+            self.validate_boolean_expression(exp, expected)
         else:
             self.fail(f"Invalid type of expected = {type(expected)}")
 
@@ -211,11 +213,14 @@ class TestParser(unittest.TestCase):
         self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an ExpressionStatement. Its a {type(stmt)}")
         exp_stmt: ExpressionStatement = stmt
 
-        self.assertTrue(isinstance(exp_stmt.expression, Boolean), f"exp_stmt.expression is not a Boolean. Its a {type(exp_stmt.expression)}")
-        exp: Boolean = exp_stmt.expression
+        self.validate_boolean_expression(exp_stmt.expression, True)
 
-        self.assertTrue(exp.token_literal() == "true", f"exp.token_literal() = {exp.token_literal()} != True")
-        self.assertTrue(exp.value == True, f"exp.value = {exp.value} != True")
+    def validate_boolean_expression(self, exp: Expression, value: bool):
+        self.assertTrue(isinstance(exp, Boolean), f"exp is not a Boolean. Its a {type(exp)}")
+        bool_exp: Boolean = exp
+
+        self.assertTrue(bool_exp.token_literal() == "true", f"bool_exp.token_literal() = {bool_exp.token_literal()} != True")
+        self.assertTrue(bool_exp.value == value, f"bool_exp.value = {bool_exp.value} != True")
 
 
 
