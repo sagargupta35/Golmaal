@@ -160,3 +160,19 @@ class InfixExpression(Expression):
     
     def expression_node(self):
         return None
+
+
+class Boolean(Expression):
+    def __init__(self, token : Token, value: bool):
+        self.token = token
+        self.value = value
+
+    def expression_node(self):
+        return
+    
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return str(self.value)
+        

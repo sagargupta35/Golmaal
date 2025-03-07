@@ -41,6 +41,8 @@ class Parser:
         self.prefix_parsing_fns[Constants.INT] = self.parse_integer_literal
         self.prefix_parsing_fns[Constants.BANG] = self.parse_prefix_expression
         self.prefix_parsing_fns[Constants.MINUS] = self.parse_prefix_expression
+        self.prefix_parsing_fns[Constants.TRUE] = self.parse_boolean_expression
+        self.prefix_parsing_fns[Constants.FALSE] = self.parse_boolean_expression
 
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
@@ -179,5 +181,9 @@ class Parser:
         self.next_token() # consume the operator
         expression.right = self.parse_expression(precedence=PREFIX)
         return expression
+    
+    def parse_boolean_expression(self) -> Expression:
+        bool_exp = Boolean(token = self.cur_token, value = self.cur_token.token_type == Constants.TRUE)
+        return bool_exp
 
   

@@ -1,7 +1,11 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_ast.ast import Statement, LetStatement, ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, Expression, InfixExpression
+from sagar.my_ast.ast import Statement, LetStatement,\
+      ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, Expression, InfixExpression,\
+      Boolean
+from sagar.my_token.token import Token, Constants
+
 
 class TestParser(unittest.TestCase):
     def test_let_statement(self):
@@ -70,11 +74,12 @@ class TestParser(unittest.TestCase):
         self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an instance of Statement. It is a {type(stmt)}")
 
         exp_stmt: ExpressionStatement = stmt
-        self.assertTrue(isinstance(exp_stmt.expression, Identifier), f"exp_stmt.expression is not an instance of Identifier. It is a {type(exp_stmt.expression)}")
-        iden = exp_stmt.expression
+        self.validate_identifier_expression(exp_stmt.expression, value='foobar')
 
-        self.assertTrue(iden.value == 'foobar', f"iden.value is not 'foobar'. Found {iden.value}")
-        self.assertTrue(iden.token_literal() == 'foobar', f"iden.token_literal() is not 'foobar'. Found {iden.token_literal()}")
+    def validate_identifier_expression(self, iden: Expression, value: str):
+        self.assertTrue(isinstance(iden, Identifier), f"exp_stmt.expression is not an instance of Identifier. It is a {type(iden)}")
+        self.assertTrue(iden.value == value, f"iden.value is not '{value}'. Found {iden.value}")
+        self.assertTrue(iden.token_literal() == value, f"iden.token_literal() is not '{value}'. Found {iden.token_literal()}")
 
     
     def test_integer_literals(self):
@@ -96,10 +101,15 @@ class TestParser(unittest.TestCase):
         for i, stmt in enumerate(program.statements):
             self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt {i} is not an Expression statment. Its a {type(stmt)}")
             exp_stmt: ExpressionStatement = stmt
-            self.assertTrue(isinstance(exp_stmt.expression, IntegerLiteral), f"exp_stmt.expression is not an IntegerLiteral. Its a {type(exp_stmt.expression)}")
-            exp: IntegerLiteral = exp_stmt.expression
-            self.assertTrue(exp.value == values[i], f"exp.value != {values[i]}. Its {exp.value}")
-            self.assertTrue(exp.token_literal() == f"{values[i]}", f'exp.token_literal() != "{values[i]}". It is {exp.token_literal()}')
+            self.validate_integer_literal(right=exp_stmt.expression, int_val=values[i])
+
+    def validate_literal_expression(self, exp: Expression, expected):
+        if isinstance(expected, int):
+            self.validate_integer_literal(exp, expected)
+        elif isinstance(expected, str):
+            self.validate_identifier_expression(exp, expected)
+        else:
+            self.fail(f"Invalid type of expected = {type(expected)}")
 
     def test_prefix_expression(self):
         prefix_exps = [("!5;", "!", 5), ("-15;", "-", 15)]
@@ -156,14 +166,22 @@ class TestParser(unittest.TestCase):
             self.assertTrue(inf_stmt.operator == op, f"inf_stmt{i}.operator == {inf_stmt.operator} != {op}")
             self.validate_integer_literal(right= inf_stmt.right, int_val=right)
 
+    def validate_infix_expression(self, exp: Expression, left, operator: str, right):
+        self.assertTrue(isinstance(exp, InfixExpression), f"type(exp) = {type(exp)} != InfixExpression")
+        op_exp: InfixExpression = exp
+        self.validate_literal_expression(op_exp.left, left)
+        self.assertTrue(op_exp.operator == operator, f"op_exp.operator = {op_exp.operator} != {operator}")
+        self.validate_literal_expression(op_exp.right, right)
+
     def test_operator_precedence(self):
         tests = [( "-a * b", "((-a) * b)"), ("!-a", "(!(-a))"), ("a + b + c", "((a + b) + c)"),\
-                  ("a + b- c", "((a + b) - c)"), ("a * b * c", "((a * b) * c)"), ("a * b / c", "((a * b) / c)"),\
-                    ("a + b / c", "(a + (b / c))"), ("a + b * c + d / e- f", "(((a + (b * c)) + (d / e)) - f)"),\
-                     ("3 + 4;-5 * 5", "(3 + 4)((-5) * 5)"), ("5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"),\
-                      ("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"),\
-                       ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),\
-                        ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))")]
+                ("a + b- c", "((a + b) - c)"), ("a * b * c", "((a * b) * c)"), ("a * b / c", "((a * b) / c)"),\
+                ("a + b / c", "(a + (b / c))"), ("a + b * c + d / e- f", "(((a + (b * c)) + (d / e)) - f)"),\
+                ("3 + 4;-5 * 5", "(3 + 4)((-5) * 5)"), ("5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"),\
+                ("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"),\
+                ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),\
+                ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"), ("true", "True"),\
+                ("false", "False"), ("3 > 5 == False", "((3 > 5) == False)"), ("3 < 5 == True", "((3 < 5) == True)")]
 
         for inp, expexted in tests:
             l = new_lexer(inp)
@@ -177,6 +195,28 @@ class TestParser(unittest.TestCase):
         il: IntegerLiteral = right
         self.assertTrue(il.value == int_val, f"il.value is {il.value} != {int_val}")
         self.assertTrue(il.token_literal() == str(int_val), f"il.token_literal() is {il.token_literal()} != {int_val}")
+
+
+    def test_boolean_expressions(self):
+        inp = "true"
+
+        l = new_lexer(inp)
+        p = Parser(l)
+        program = p.parse_program()
+        self.check_parse_errors(p)
+
+        self.assertTrue(len(program.statements) == 1, f"Expected 1 statement. Got {len(program.statements)} instead")
+        stmt = program.statements[0]
+
+        self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an ExpressionStatement. Its a {type(stmt)}")
+        exp_stmt: ExpressionStatement = stmt
+
+        self.assertTrue(isinstance(exp_stmt.expression, Boolean), f"exp_stmt.expression is not a Boolean. Its a {type(exp_stmt.expression)}")
+        exp: Boolean = exp_stmt.expression
+
+        self.assertTrue(exp.token_literal() == "true", f"exp.token_literal() = {exp.token_literal()} != True")
+        self.assertTrue(exp.value == True, f"exp.value = {exp.value} != True")
+
 
 
     def check_parse_errors(self, p: Parser):
