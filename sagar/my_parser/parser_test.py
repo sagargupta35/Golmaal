@@ -104,19 +104,19 @@ class TestParser(unittest.TestCase):
             self.validate_integer_literal(right=exp_stmt.expression, int_val=values[i])
 
     def validate_literal_expression(self, exp: Expression, expected):
-        if isinstance(expected, int):
-            self.validate_integer_literal(exp, expected)
-        elif isinstance(expected, str):
-            self.validate_identifier_expression(exp, expected)
-        elif isinstance(expected, bool):
+        if type(expected) is bool:
             self.validate_boolean_expression(exp, expected)
+        elif type(expected) is str :
+            self.validate_identifier_expression(exp, expected)
+        elif type(expected) is int:
+            self.validate_integer_literal(exp, expected)
         else:
             self.fail(f"Invalid type of expected = {type(expected)}")
 
     def test_prefix_expression(self):
-        prefix_exps = [("!5;", "!", 5), ("-15;", "-", 15)]
+        prefix_exps = [("!5", "!", 5), ("-1", "-", 1), ("!true", "!", True), ("!false", "!", False)]
 
-        for inp, op, int_val in prefix_exps:
+        for inp, op, val in prefix_exps:
             l = new_lexer(input=inp)
             p = Parser(lexer= l)
 
@@ -133,7 +133,7 @@ class TestParser(unittest.TestCase):
             exp: PrefixExpression = exp_stmt.expression
 
             self.assertTrue(exp.operator == op, f"exp.operator != {op}. Its {exp.operator}")
-            self.validate_integer_literal(exp.right, int_val)
+            self.validate_literal_expression(exp.right, val)
 
     def test_infix_expression(self):
         infix_tests = [
