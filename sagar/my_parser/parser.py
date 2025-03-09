@@ -43,6 +43,7 @@ class Parser:
         self.prefix_parsing_fns[Constants.MINUS] = self.parse_prefix_expression
         self.prefix_parsing_fns[Constants.TRUE] = self.parse_boolean_expression
         self.prefix_parsing_fns[Constants.FALSE] = self.parse_boolean_expression
+        self.prefix_parsing_fns[Constants.LPAREN] = self.parse_grouped_expression
 
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
@@ -185,5 +186,13 @@ class Parser:
     def parse_boolean_expression(self) -> Expression:
         bool_exp = Boolean(token = self.cur_token, value = self.cur_token.token_type == Constants.TRUE)
         return bool_exp
+    
+    def parse_grouped_expression(self) -> Expression:
+        self.next_token()
+        exp = self.parse_expression(LOWEST)
+        if not self.expect_peek(Constants.RPAREN):
+            return None
+        return exp
+
 
   
