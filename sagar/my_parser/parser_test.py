@@ -200,26 +200,28 @@ class TestParser(unittest.TestCase):
 
 
     def test_boolean_expressions(self):
-        inp = "true"
+        inputs = ['true', 'false']
+        values = [True, False]
 
-        l = new_lexer(inp)
-        p = Parser(l)
-        program = p.parse_program()
-        self.check_parse_errors(p)
+        for i, inp in enumerate(inputs):
+            l = new_lexer(inp)
+            p = Parser(l)
+            program = p.parse_program()
+            self.check_parse_errors(p)
 
-        self.assertTrue(len(program.statements) == 1, f"Expected 1 statement. Got {len(program.statements)} instead")
-        stmt = program.statements[0]
+            self.assertTrue(len(program.statements) == 1, f"Expected 1 statement. Got {len(program.statements)} instead")
+            stmt = program.statements[0]
 
-        self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an ExpressionStatement. Its a {type(stmt)}")
-        exp_stmt: ExpressionStatement = stmt
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an ExpressionStatement. Its a {type(stmt)}")
+            exp_stmt: ExpressionStatement = stmt
 
-        self.validate_boolean_expression(exp_stmt.expression, True)
+            self.validate_boolean_expression(exp_stmt.expression, values[i])
 
     def validate_boolean_expression(self, exp: Expression, value: bool):
         self.assertTrue(isinstance(exp, Boolean), f"exp is not a Boolean. Its a {type(exp)}")
         bool_exp: Boolean = exp
 
-        self.assertTrue(bool_exp.token_literal() == "true", f"bool_exp.token_literal() = {bool_exp.token_literal()} != True")
+        self.assertTrue(bool_exp.token_literal() == str(value).lower(), f"bool_exp.token_literal() = {bool_exp.token_literal()} != {str(value).lower()}")
         self.assertTrue(bool_exp.value == value, f"bool_exp.value = {bool_exp.value} != True")
 
 
