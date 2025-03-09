@@ -1,9 +1,7 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_ast.ast import Statement, LetStatement,\
-      ReturnStatement, ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, Expression, InfixExpression,\
-      Boolean
+from sagar.my_ast.ast import *
 from sagar.my_token.token import Token, Constants
 
 
