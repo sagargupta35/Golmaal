@@ -225,6 +225,72 @@ class TestParser(unittest.TestCase):
         self.assertTrue(bool_exp.value == value, f"bool_exp.value = {bool_exp.value} != True")
 
 
+    # dont see. The code in both of them is repeated and its ugly 🫣
+    def test_if_expression(self):
+        inp = 'if (x < y) { x }'
+        l = new_lexer(inp)
+        p = Parser(l)
+
+        program = p.parse_program()
+        self.check_parse_errors(p)
+
+        self.assertTrue(len(program.statements) == 1, f"len(program.statements) = {len(program.statements)} != 1")
+        stmt = program.statements[0]
+        
+        self.assertTrue(isinstance(stmt, ExpressionStatement), f'stmt is not an ExpressionStatement. Its a {type(stmt)}')
+        exp_stmt: ExpressionStatement = stmt
+        exp = exp_stmt.expression
+        self.assertTrue(isinstance(exp, IfExpression), f'exp_stmt.expression is not an IfExpression. Its a {type(exp)}')
+        if_exp: IfExpression = exp
+        self.validate_infix_expression(if_exp.condition, 'x', '<', 'y')
+
+        self.assertTrue(len(if_exp.consequence.statements) == 1, f'len(if_exp.consequence.statements) = {len(if_exp.consequence.statements)} != 1')
+        con_stmt = if_exp.consequence.statements[0]
+
+        self.assertTrue(isinstance(con_stmt, ExpressionStatement), f'con_stmt is not ExpressionStmt. Its a {type(con_stmt)}')
+        con_exp_stmt: ExpressionStatement = con_stmt
+
+        self.validate_identifier_expression(con_exp_stmt.expression, 'x')
+
+        if if_exp.alternative:
+            self.fail(f'if_exp.alternative is expected to be None. But got {if_exp.alternative}')
+
+    def test_if_else_exp(self):
+        inp = 'if (x < y) { x } else { y }'
+        l = new_lexer(inp)
+        p = Parser(l)
+
+        program = p.parse_program()
+        self.check_parse_errors(p)
+
+        self.assertTrue(len(program.statements) == 1, f"len(program.statements) = {len(program.statements)} != 1")
+        stmt = program.statements[0]
+        
+        self.assertTrue(isinstance(stmt, ExpressionStatement), f'stmt is not an ExpressionStatement. Its a {type(stmt)}')
+        exp_stmt: ExpressionStatement = stmt
+
+        exp = exp_stmt.expression
+        self.assertTrue(isinstance(exp, IfExpression), f'exp_stmt.expression is not an IfExpression. Its a {type(exp)}')
+
+        if_exp: IfExpression = exp
+        self.validate_infix_expression(if_exp.condition, 'x', '<', 'y')
+
+        self.assertTrue(len(if_exp.consequence.statements) == 1, f'len(if_exp.consequence.statements) = {len(if_exp.consequence.statements)} != 1')
+        con_stmt = if_exp.consequence.statements[0]
+
+        self.assertTrue(isinstance(con_stmt, ExpressionStatement), f'con_stmt is not ExpressionStmt. Its a {type(con_stmt)}')
+        con_exp_stmt: ExpressionStatement = con_stmt
+
+        self.validate_identifier_expression(con_exp_stmt.expression, 'x')
+
+        if if_exp.alternative:
+            self.assertTrue(len(if_exp.alternative.statements) == 1, f'len(if_exp.alternative.statements) = {len(if_exp.alternative.statements)} != 1')
+            alt_stmt = if_exp.alternative.statements[0]
+
+            self.assertTrue(isinstance(alt_stmt, ExpressionStatement), f'alt_stmt is not ExpressionStmt. Its a {type(alt_stmt)}')
+            alt_exp_stmt: ExpressionStatement = alt_stmt
+
+            self.validate_identifier_expression(alt_exp_stmt.expression, 'y')
 
     def check_parse_errors(self, p: Parser):
         errors = p.errors
@@ -238,8 +304,7 @@ class TestParser(unittest.TestCase):
             print(f"Error {i}: {error}")
 
         self.fail()
-
-    
+        
 
 if __name__ == "__main__":
     unittest.main() 

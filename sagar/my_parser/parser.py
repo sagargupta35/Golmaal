@@ -44,6 +44,7 @@ class Parser:
         self.prefix_parsing_fns[Constants.TRUE] = self.parse_boolean_expression
         self.prefix_parsing_fns[Constants.FALSE] = self.parse_boolean_expression
         self.prefix_parsing_fns[Constants.LPAREN] = self.parse_grouped_expression
+        self.prefix_parsing_fns[Constants.IF] = self.parse_if_expression
 
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
@@ -193,6 +194,44 @@ class Parser:
         if not self.expect_peek(Constants.RPAREN):
             return None
         return exp
+    
+    def parse_if_expression(self):
+        if_exp = IfExpression(token = self.cur_token, condition=None, consequence=None, alternative=None)
+        self.next_token() 
+        
+        #stands at (
+        if_exp.condition = self.parse_grouped_expression() # after this token is at )
+        
+        self.expect_peek(Constants.LBRACE) 
+
+        consequence: BlockStatement = self.parse_block_statement()
+        if_exp.consequence = consequence
+
+        if self.peek_token.token_type == Constants.ELSE:
+            self.next_token() # stands at else
+            self.expect_peek(Constants.LBRACE)
+            if_exp.alternative = self.parse_block_statement()
+
+        return if_exp
+    
+
+    def parse_block_statement(self):
+        block_stmt = BlockStatement(token=self.cur_token)
+        self.next_token() # token is at {
+
+        while self.cur_token.token_type != Constants.RBRACE and self.cur_token.token_type != Constants.EOF:
+            stmt = self.parse_statement()
+            if stmt:
+                block_stmt.statements.append(self.parse_statement())
+            self.next_token() # move to the next statement (might be standing at semicolon or not)
+        
+        if self.cur_token.token_type != Constants.RBRACE:
+            self.errors.append(f'Expected {Constants.RBRACE} at the end of block statment. But it is {self.cur_token}')
+            return None
+        
+        return block_stmt
+
+
 
 
   
