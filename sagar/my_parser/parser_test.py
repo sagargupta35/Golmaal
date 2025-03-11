@@ -292,6 +292,36 @@ class TestParser(unittest.TestCase):
 
             self.validate_identifier_expression(alt_exp_stmt.expression, 'y')
 
+
+    def test_function_literal(self):
+        inp = 'fn(x, y){x + y;}'
+        l = new_lexer(inp)
+        p = Parser(l)
+
+        program = p.parse_program()
+        self.check_parse_errors(p)
+
+        self.assertTrue(len(program.statements) == 1, f"len(program.statements) = {len(program.statements)} != 1")
+        stmt = program.statements[0]
+
+        self.assertTrue(isinstance(stmt, ExpressionStatement), f"stmt is not an ExpressionStatement. Its a {type(stmt)}")
+        exp_stmt: ExpressionStatement = stmt
+
+        self.assertTrue(isinstance(exp_stmt.expression, FunctionLiteral), f"exp_stmt.expression is not a FunctionLiteral. Its a {type(exp_stmt.expression)}")
+        func: FunctionLiteral = exp_stmt.expression
+
+        self.assertTrue(len(func.parameters) == 2, f"func.parameters does not contain 2 parameters. It contains {len(func.parameters)}")
+        self.validate_identifier_expression(func.parameters[0], 'x')
+        self.validate_identifier_expression(func.parameters[1], 'y')
+
+        self.assertTrue(len(func.body.statements) == 1, f"func.body.statements does not contain 1 statement. It contains {len(func.body.statements)}")
+        body_stmt = func.body.statements[0]
+
+        self.assertTrue(isinstance(body_stmt, ExpressionStatement), f"body_stmt is not an ExpressionStatement. Its a {type(body_stmt)}")
+        body_exp_stmt: ExpressionStatement = body_stmt
+
+        self.validate_infix_expression(body_exp_stmt.expression, 'x', '+', 'y')
+
     def check_parse_errors(self, p: Parser):
         errors = p.errors
 
@@ -304,7 +334,9 @@ class TestParser(unittest.TestCase):
             print(f"Error {i}: {error}")
 
         self.fail()
-        
+    
+
+
 
 if __name__ == "__main__":
     unittest.main() 

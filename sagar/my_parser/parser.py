@@ -45,6 +45,7 @@ class Parser:
         self.prefix_parsing_fns[Constants.FALSE] = self.parse_boolean_expression
         self.prefix_parsing_fns[Constants.LPAREN] = self.parse_grouped_expression
         self.prefix_parsing_fns[Constants.IF] = self.parse_if_expression
+        self.prefix_parsing_fns[Constants.FUNCTION] = self.parse_function_literal
 
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
@@ -86,7 +87,7 @@ class Parser:
                 exp_stmt = self.parse_expression_statement()
                 return exp_stmt
             
-    def parse_let_statement(self) -> Statement:
+    def parse_let_statement(self) -> LetStatement:
         letstmt = LetStatement(token=self.cur_token, name = None, value = None)
         
         if not self.expect_peek(Constants.IDENT):
@@ -108,7 +109,7 @@ class Parser:
 
         return letstmt
     
-    def parse_return_statement(self):
+    def parse_return_statement(self) -> ReturnStatement:
         rt_stmt = ReturnStatement(token = self.cur_token, value = None)
 
         self.next_token() # stands at the start of the expression
@@ -195,41 +196,69 @@ class Parser:
             return None
         return exp
     
-    def parse_if_expression(self):
+    def parse_if_expression(self) -> IfExpression:
         if_exp = IfExpression(token = self.cur_token, condition=None, consequence=None, alternative=None)
         self.next_token() 
         
         #stands at (
         if_exp.condition = self.parse_grouped_expression() # after this token is at )
         
-        self.expect_peek(Constants.LBRACE) 
+        if not self.expect_peek(Constants.LBRACE):
+            return None
 
         consequence: BlockStatement = self.parse_block_statement()
         if_exp.consequence = consequence
 
         if self.peek_token.token_type == Constants.ELSE:
             self.next_token() # stands at else
-            self.expect_peek(Constants.LBRACE)
+            if not self.expect_peek(Constants.LBRACE):
+                return None
             if_exp.alternative = self.parse_block_statement()
 
         return if_exp
     
 
-    def parse_block_statement(self):
+    def parse_block_statement(self) -> BlockStatement:
         block_stmt = BlockStatement(token=self.cur_token)
         self.next_token() # token is at {
-
+        
         while self.cur_token.token_type != Constants.RBRACE and self.cur_token.token_type != Constants.EOF:
             stmt = self.parse_statement()
             if stmt:
-                block_stmt.statements.append(self.parse_statement())
+                block_stmt.statements.append(stmt)
             self.next_token() # move to the next statement (might be standing at semicolon or not)
-        
+
         if self.cur_token.token_type != Constants.RBRACE:
             self.errors.append(f'Expected {Constants.RBRACE} at the end of block statment. But it is {self.cur_token}')
             return None
         
         return block_stmt
+
+    def parse_function_literal(self) -> FunctionLiteral:
+        fn_lit = FunctionLiteral(token = self.cur_token)
+
+        params: list[Identifier] = []
+        self.expect_peek(Constants.LPAREN)
+        while self.cur_token.token_type != Constants.RPAREN:
+            self.next_token() # move to next identifier
+            params.append(self.parse_identifier())
+            if self.peek_token.token_type not in [Constants.COMMA, Constants.RPAREN]:
+                self.errors.append(f'Expected ")" or "," after parameter. Not {self.cur_token.token_type}')
+                return None
+            self.next_token()
+        if self.cur_token.token_type != Constants.RPAREN:
+            self.errors.append("Expected ) after declaring parameters")
+            return None
+
+        fn_lit.parameters = params
+        if not self.expect_peek(Constants.LBRACE):
+            return None
+
+        fn_lit.body = self.parse_block_statement()
+
+        return fn_lit
+
+
 
 
 

@@ -210,3 +210,19 @@ class IfExpression(Expression):
             res = f"{res}else {str(self.alternative)}"
         return res
         
+
+class FunctionLiteral(Expression):
+    def __init__(self, token: Token, parameters: BlockStatement = None, body: BlockStatement = None):
+        self.token = token
+        self.parameters: list[Identifier] = parameters
+        self.body: BlockStatement = body
+
+    def expression_node(self):
+        return
+    
+    def token_literal(self):
+        return self.token.literal
+    
+    def __str__(self):
+        return f'{self.token_literal()}({', '.join(self.parameters)}) {str(self.body)}'
+        
