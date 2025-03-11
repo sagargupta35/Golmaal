@@ -105,20 +105,24 @@ class Parser:
             return None
 
         # stands at '='
+        self.next_token()
+        
+        letstmt.value = self.parse_expression(LOWEST)
 
-        # Expression needs to be checked later
-        while self.cur_token.token_type != Constants.SEMICOLON:
+        if self.peek_token.token_type == Constants.SEMICOLON:
             self.next_token()
-
+            
         return letstmt
     
     def parse_return_statement(self) -> ReturnStatement:
         rt_stmt = ReturnStatement(token = self.cur_token, value = None)
 
         self.next_token() # stands at the start of the expression
-        #Expression needs to be checked later
-        while self.cur_token.token_type != ';':
+        rt_stmt.value = self.parse_expression(LOWEST)
+
+        if self.peek_token.token_type == Constants.SEMICOLON:
             self.next_token()
+
         return rt_stmt
 
     def expect_peek(self, token_type: TokenType) -> bool:

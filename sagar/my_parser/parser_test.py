@@ -9,14 +9,14 @@ class TestParser(unittest.TestCase):
     def test_let_statement(self):
         inp = '''
             let five = 5;
-            let ten = 10;
-            let foobar = 838383;
+            let t = true;
+            let foobar = y;
         '''
 
         l = new_lexer(inp)
         p = Parser(lexer= l)
 
-        identifiers = ['five', 'ten', 'foobar']
+        identifiers = [('five', 5), ('t', True), ('foobar', 'y')]
 
         program = p.parse_program()
         self.check_parse_errors(p)
@@ -24,15 +24,16 @@ class TestParser(unittest.TestCase):
         self.assertTrue(program != None, f"Unable to parse program. Parser returned None")
         self.assertTrue(len(program.statements) == 3, f"Expected 3 statements. But found {len(program.statements)}")
 
-        for iden, stmt in zip(identifiers, program.statements):
-            self.validate_let_statement(stmt, iden)
+        for (iden, exp), stmt in zip(identifiers, program.statements):
+            self.validate_let_statement(stmt, iden, exp)
 
-    def validate_let_statement(self, stmt: Statement, iden: str):
+    def validate_let_statement(self, stmt: Statement, iden: str, expected):
         self.assertTrue(stmt.token_literal() == 'let', f"Expected let as token literal for stmt. But found {stmt.token_literal()}")
         self.assertTrue(isinstance(stmt, LetStatement), f"stmt is not instance of LetStatement. It is a {type(stmt)}")
         letstmt: LetStatement = stmt
         self.assertTrue(letstmt.name.token_literal() == iden, f"letstmt.name.token_literal() is not {iden}. Found {letstmt.name.token_literal()}")
         self.assertTrue(letstmt.name.value == iden, f"letstmt.name.value is not {iden}. Found {letstmt.name.value}")
+        self.validate_literal_expression(letstmt.value, expected)
 
 
     def test_return_statement(self):
