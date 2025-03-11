@@ -347,6 +347,46 @@ class TestParser(unittest.TestCase):
                 self.assertTrue(parameters[i].token_literal() == param, f'parameters[i].token_literal() = {parameters[i].token_literal()} != {param}')                
 
 
+    def test_call_expression(self):
+        # add() add(foobar) add(2, fn(x, y){x+y}(2, 3)) add(2, 3*5, 4+8)
+        inps = ['add()', 'add(foobar)', 'add(2, fn(x, y){x+y}(2, 3))', 'add(2, 3*5, 4+8)']
+        for i, inp in enumerate(inps):
+            l = new_lexer(inp)
+            p = Parser(l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            self.assertTrue(len(program.statements) == 1, f'len(program.statements) = {len(program.statements)} != 1')
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f'stmt {i} is not an ExpressionStatement. Its a {type(stmt)}')
+            exp_stmt: ExpressionStatement = stmt
+
+            self.assertTrue(isinstance(exp_stmt.expression, CallExpression), f'exp_stmt.expression {i} is not a CallExpression. Its a {type(exp_stmt.expression)}')            
+            exp: CallExpression = exp_stmt.expression
+
+            self.validate_identifier_expression(exp.function, 'add')
+            args = exp.arguments
+
+            self.assertTrue(len(args) == i, f'len(args) = {len(args)} != {i}')
+            match i:
+                case 0:
+                    continue
+                case 1:
+                    self.validate_identifier_expression(args[0], 'foobar')
+                case 2:
+                    self.validate_integer_literal(args[0], 2)
+                    self.assertTrue(isinstance(args[1], CallExpression), f'arg2 is not a CallExpression. Its a {type(args[1])}')
+                    arg2: CallExpression = args[1]
+                    arg2_args = arg2.arguments
+                    self.validate_integer_literal(arg2_args[0], 2)
+                    self.validate_integer_literal(arg2_args[1], 3)
+                case _:
+                    self.validate_integer_literal(args[0], 2)
+                    self.validate_infix_expression(args[1], 3, '*', 5)
+                    self.validate_infix_expression(args[2], 4, '+', 8)
+
 
     def check_parse_errors(self, p: Parser):
         errors = p.errors

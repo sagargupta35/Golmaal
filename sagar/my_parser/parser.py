@@ -24,6 +24,7 @@ precedences: dict[TokenType, int] = {
     Constants.MINUS: SUM,
     Constants.SLASH: PRODUCT,
     Constants.ASTERISK: PRODUCT,
+    Constants.LPAREN: CALL
 }
 
 class Parser:
@@ -50,6 +51,8 @@ class Parser:
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
             self.infix_parsing_fns[infix_op] = self.parse_infix_expression
+        
+        self.infix_parsing_fns[Constants.LPAREN] = self.parse_lparen_infix
 
     def peek_precedence(self):
         return precedences.get(self.peek_token.token_type, LOWEST)
@@ -157,6 +160,7 @@ class Parser:
                 return left_exp
             
             self.next_token()
+
             left_exp = infix(left_exp)
         
         return left_exp
@@ -265,6 +269,27 @@ class Parser:
 
         return fn_lit
 
+    def parse_lparen_infix(self, left: Expression) -> CallExpression:
+        call_exp = CallExpression(token=self.cur_token, function=left)
+        
+        args = []
+        
+        while self.cur_token.token_type not in [Constants.RPAREN, Constants.EOF]:
+            self.next_token()
+            if self.cur_token.token_type in [Constants.RPAREN, Constants.EOF]: 
+                break
+            args.append(self.parse_expression(LOWEST))
+            if self.peek_token.token_type not in [Constants.RPAREN, Constants.COMMA]:
+                self.errors.append(f'Expected , or ) after each argument in the CallExpression')
+                return None
+            self.next_token()
+        
+        if self.cur_token.token_type != Constants.RPAREN:
+            return None
+        
+        call_exp.arguments = args
+        return call_exp
+
     def ensure_identifier_naming_convention(self, name) -> False:
         if type(name) is not str:
             return False
@@ -276,6 +301,9 @@ class Parser:
             if not is_letter_or_digit(c):
                 return False
         return True
+
+    
+
 
     
 
