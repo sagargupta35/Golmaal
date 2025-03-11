@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from sagar.my_token.token import Token
+from sagar.my_token.token import Token, Constants
 
 class Node(ABC):
     @abstractmethod
@@ -56,7 +56,7 @@ class LetStatement(Statement):
     def __str__(self) -> str:
         res: list[str] = []
         res.append('let')
-        res.append(self.name)
+        res.append(str(self.name))
         res.append('=')
         if self.value:
             res.append(str(self.value))
@@ -224,7 +224,7 @@ class FunctionLiteral(Expression):
         return self.token.literal
     
     def __str__(self):
-        return f'{self.token_literal()} ({', '.join([str(param) for param in self.parameters])}) {str(self.body)}'
+        return f'{self.token_literal()}({', '.join([str(param) for param in self.parameters])}){Constants.LBRACE} {str(self.body)} {Constants.RBRACE}'
     
 
 class CallExpression(Expression):

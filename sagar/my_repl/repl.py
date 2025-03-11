@@ -1,7 +1,8 @@
 from sagar.my_token.token import Token, Constants
 from sagar.lexer import Lexer
+from sagar.my_parser.parser import Parser
 
-PROMPT = ">>"
+PROMPT = "##"
 
 def start():
     while True:
@@ -9,11 +10,14 @@ def start():
         if line == 'quit':
             break
         l = Lexer.new_lexer(line)
-        con = Constants()
+        p = Parser(l)
+        program = p.parse_program()
 
-        tok = l.next_token()
-        while tok.token_type != con.EOF:
-            print(tok)
-            tok = l.next_token()
+        if len(p.errors):
+            for error in p.errors:
+                print(error)
+            continue
+
+        print(str(program))
 
 
