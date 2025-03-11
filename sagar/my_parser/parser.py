@@ -1,4 +1,4 @@
-from sagar.lexer.Lexer import Lexer
+from sagar.lexer.Lexer import Lexer, is_letter_or_digit
 from sagar.my_token.token import Token, Constants, TokenType
 from sagar.my_ast.ast import *
 from typing import Callable
@@ -171,6 +171,8 @@ class Parser:
 
     
     def parse_identifier(self) -> Expression:
+        if not self.ensure_identifier_naming_convention(self.cur_token.literal):
+            self.errors.append(f'{self.cur_token.literal} does not follow proper naming convention of an identifier')
         return Identifier(token = self.cur_token, value = self.cur_token.literal)
     
     def parse_integer_literal(self) -> Expression:
@@ -238,14 +240,19 @@ class Parser:
         fn_lit = FunctionLiteral(token = self.cur_token)
 
         params: list[Identifier] = []
-        self.expect_peek(Constants.LPAREN)
-        while self.cur_token.token_type != Constants.RPAREN:
-            self.next_token() # move to next identifier
+        self.expect_peek(Constants.LPAREN) # stands at Lparen
+
+        while self.cur_token.token_type not in  [Constants.EOF, Constants.RPAREN]:
+            self.next_token()
+            #takes care for zero params or , after all params followed by ) while you are expecting an identifier
+            if self.cur_token.token_type in [Constants.RPAREN, Constants.EOF]: 
+                break
             params.append(self.parse_identifier())
-            if self.peek_token.token_type not in [Constants.COMMA, Constants.RPAREN]:
+            self.next_token() # move to next , or )
+            if self.cur_token.token_type not in [Constants.COMMA, Constants.RPAREN]:
                 self.errors.append(f'Expected ")" or "," after parameter. Not {self.cur_token.token_type}')
                 return None
-            self.next_token()
+            
         if self.cur_token.token_type != Constants.RPAREN:
             self.errors.append("Expected ) after declaring parameters")
             return None
@@ -258,7 +265,19 @@ class Parser:
 
         return fn_lit
 
+    def ensure_identifier_naming_convention(self, name) -> False:
+        if type(name) is not str:
+            return False
+        if len(name) == 0:
+            return False
+        if (name[0] < 'a' or name[0] > 'z') and (name[0] < 'A' or name[0] > 'Z'):
+            return False
+        for c in name:
+            if not is_letter_or_digit(c):
+                return False
+        return True
 
+    
 
 
 

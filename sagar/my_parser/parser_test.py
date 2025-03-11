@@ -322,6 +322,32 @@ class TestParser(unittest.TestCase):
 
         self.validate_infix_expression(body_exp_stmt.expression, 'x', '+', 'y')
 
+    def test_function_params(self):
+        inps = [('fn(){}', []), ('fn(x,){x}', ['x']), ('fn(x, y, z,){x+y+z;}', ['x', 'y', 'z'])]
+        for i, (inp, expected) in enumerate(inps):
+            l = new_lexer(inp)
+            p = Parser(l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            self.assertTrue(len(program.statements) == 1, f"len(program.statements) = {len(program.statements)} != 1")
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f'stmt {i} is not an ExpressionStatement. Its a {type(stmt)}')
+            exp_stmt: ExpressionStatement = stmt
+
+            self.assertTrue(isinstance(exp_stmt.expression, FunctionLiteral), f'exp_stmt {i} is not a FunctionLiteral. Its a {type(exp_stmt)}')            
+            exp: FunctionLiteral = exp_stmt.expression
+
+            self.assertTrue(len(exp.parameters) == len(expected), f'len(exp.parameters) = {len(exp.parameters)} != {len(expected)}')       
+            parameters = exp.parameters
+            for i, param in enumerate(expected):
+                self.assertTrue(isinstance(parameters[i], Identifier), f"parameters[i] is not an Identifier. Its a {type(parameters[i])}")
+                self.assertTrue(parameters[i].token_literal() == param, f'parameters[i].token_literal() = {parameters[i].token_literal()} != {param}')                
+
+
+
     def check_parse_errors(self, p: Parser):
         errors = p.errors
 
