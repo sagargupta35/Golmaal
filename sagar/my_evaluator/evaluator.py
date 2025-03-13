@@ -36,10 +36,14 @@ def eval(node: Node) -> Object:
         return eval_infix_expression(node.operator, left, right)
 
     elif isinstance(node, BlockStatement):
-        return eval_statements(node.statements)
+        return eval_block_statements(node.statements)
     
     elif isinstance(node, IfExpression):
         return eval_if_expression(node)
+    
+    elif isinstance(node, ReturnStatement):
+        value = eval(node.value)
+        return ReturnObj(value=value)
     
     return EvalConstants.NULL_OBJ
 
@@ -48,6 +52,18 @@ def eval_statements(statements: list[Statement]) -> Object:
 
     for statement in statements:
         res = eval(statement)
+
+        if isinstance(res, ReturnObj):
+            return res.value
+
+    return res
+
+def eval_block_statements(statements: list[Statement]) -> Object:
+    for statement in statements:
+        res = eval(statement)
+
+        if isinstance(res, ReturnObj):
+            return res
 
     return res
 

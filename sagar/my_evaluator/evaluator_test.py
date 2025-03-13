@@ -29,7 +29,7 @@ class TestEvaluator(unittest.TestCase):
             self.validate_integer_obj(evaluated, exp, i)
 
     def validate_integer_obj(self, obj: Object, value: int, idx: int = -1):
-        self.assertTrue(isinstance(obj, IntegerObj), f'obj -> {idx} is not an IntegerObj. It is a {str(obj)}')
+        self.assertTrue(isinstance(obj, IntegerObj), f'obj -> {idx} is not an IntegerObj. It is a {type(obj)}')
         int_obj: IntegerObj = obj
         self.assertTrue(int_obj.value == value, f'int_obj.value -> {idx} = {int_obj.value} != {value}')
 
@@ -80,6 +80,26 @@ class TestEvaluator(unittest.TestCase):
             else:
                 self.validate_integer_obj(evaluated, value=exp, idx=i)
 
+
+    def test_return_statements(self):
+        inps = [
+            ("return 10;", 10),
+            ("return 10; 9;", 10),
+            ("return 2 * 5; 9;", 10),
+            ("9; return 2 * 5; 9;", 10),
+            ('''
+                if(10 > 1){
+                    if(10 > 1){
+                        return 10;
+                    }
+                    return 1;
+                }
+            ''', 10)
+        ]
+
+        for i, (inp, exp) in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            self.validate_integer_obj(evaluated, exp, idx=i)
 
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)

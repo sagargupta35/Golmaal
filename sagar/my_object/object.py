@@ -18,6 +18,7 @@ class ObjConstants:
     INTEGER_OBJ = 'INTEGER'
     BOOLEAN_OBJ = 'BOOLEAN'
     NULL_OBJ = 'NULL'
+    RETURN_VALUE_OBJ = 'RETURN_VALUE'
 
 class IntegerObj(Object):
     def __init__(self, value: int):
@@ -53,3 +54,15 @@ class NullObj(Object):
     
     def inspect(self):
         return 'NULL'
+    
+
+class ReturnObj(Object):
+
+    def __init__(self, value: Object):
+        self.value: Object = value
+
+    def get_type(self):
+        return ObjConstants.RETURN_VALUE_OBJ
+
+    def inspect(self):
+        return self.value.inspect()
