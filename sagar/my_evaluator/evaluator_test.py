@@ -8,7 +8,7 @@ from sagar.my_object.object import *
 class TestEvaluator(unittest.TestCase):
 
     def test_eval_integer_expression(self):
-        inps = [("5", 5), ("10", 10)]
+        inps = [("5", 5), ("10", 10), ('-5', -5), ('-10', -10), ('-0', 0)]
         for (inp, exp) in inps:
             evaluated: Object = self.get_eval(inp)
             self.validate_integer_obj(evaluated, exp)
@@ -21,14 +21,21 @@ class TestEvaluator(unittest.TestCase):
 
     def test_eval_boolean_expression(self):
         inps = [('true', True), ('false', False)]
-        for (inp, exp) in inps:
+        for i, (inp, exp) in enumerate(inps):
             evaluated: Object = self.get_eval(inp)
-            self.validate_boolean_obj(evaluated, exp)
+            self.validate_boolean_obj(evaluated, exp, idx = i)
 
-    def validate_boolean_obj(self, obj: Object, value: bool):
+    def test_bang_operator(self):
+        inps = [('!true', False), ('!false', True), ('!5', False), ('!0', True), ('!!true', True), ('!!false', False)]
+        for i, (inp, exp) in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            self.validate_boolean_obj(evaluated, exp, idx = i)
+
+    def validate_boolean_obj(self, obj: Object, value: bool, idx: int = -1):
         self.assertTrue(isinstance(obj, BooleanObj), f'obj is not an BooleanObj. It is a {str(obj)}')
         bool_obj: BooleanObj = obj
-        self.assertTrue(bool_obj.value == value, f'bool_obj.value = {bool_obj.value} != {value}')        
+        self.assertTrue(bool_obj.value == value, f'bool_obj.value->{idx} = {bool_obj.value} != {value}')        
+
 
 
     def get_eval(self, inp: str) -> Object:
