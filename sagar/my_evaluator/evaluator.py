@@ -6,91 +6,141 @@ from dataclasses import dataclass
 class EvalConstants:
     TRUE_BOOLEAN_OBJ = BooleanObj(True)
     FALSE_BOOLEAN_OBJ = BooleanObj(False)
+    NULL_OBJ = NullObj()
 
 
 def eval(node: Node) -> Object:
-    res = NullObj()
     
     if isinstance(node, Program):
-        res = eval_statements(node.statements)
+        return eval_statements(node.statements)
     
     elif isinstance(node, ExpressionStatement):
-        res = eval(node.expression)
+        return eval(node.expression)
 
     elif isinstance(node, IntegerLiteral):
-        res = IntegerObj(value=node.value)
+        return IntegerObj(value=node.value)
 
     elif isinstance(node, Boolean):
         if node.value:
-            res = EvalConstants.TRUE_BOOLEAN_OBJ # As all boolean true objs are same follow singleton approach
+            return EvalConstants.TRUE_BOOLEAN_OBJ # As all boolean true objs are same follow singleton approach
         else:
-            res = EvalConstants.FALSE_BOOLEAN_OBJ
+            return EvalConstants.FALSE_BOOLEAN_OBJ
     
     elif isinstance(node, PrefixExpression):
         right = eval(node.right)
-        res = eval_prefix_expression(node.operator, right)
+        return eval_prefix_expression(node.operator, right)
     
-    if isinstance(res, NullObj):
-        res.messages.append('eval')
+    elif isinstance(node, InfixExpression):
+        left = eval(node.left)
+        right = eval(node.right)
+        return eval_infix_expression(node.operator, left, right)
 
-    return res
+    elif isinstance(node, BlockStatement):
+        return eval_statements(node.statements)
+    
+    elif isinstance(node, IfExpression):
+        return eval_if_expression(node)
+    
+    return EvalConstants.NULL_OBJ
 
 
 def eval_statements(statements: list[Statement]) -> Object:
-    res = NullObj()
 
     for statement in statements:
         res = eval(statement)
 
-    if isinstance(res, NullObj):
-        res.messages.append('eval_statements')
-
     return res
 
 def eval_prefix_expression(operator: str, right: Object) -> Object:
-    res = NullObj()
 
     if operator == '!':
-        res = eval_bang_operator(right)
+        return eval_bang_operator(right)
     
     elif operator == '-':
-        res = eval_minus_operator(right)
+        return eval_minus_operator(right)
     
-    if isinstance(res, NullObj):
-        res.messages.append('eval_prefix_expression')
-    
-    return res
+    return EvalConstants.NULL_OBJ
 
 def eval_minus_operator(right: Object) -> Object:
-    res = NullObj()
 
     if isinstance(right, IntegerObj):
-        res = IntegerObj(-right.value)
+        return IntegerObj(-right.value)
     
-    if isinstance(res, NullObj):
-        res.messages.append('eval_minus_operator')
-    
-    return res
+    return EvalConstants.NULL_OBJ
 
 def eval_bang_operator(right: Object) -> Object:
-    res = NullObj()
 
     if isinstance(right, BooleanObj):
         if right is EvalConstants.TRUE_BOOLEAN_OBJ:
-            res = EvalConstants.FALSE_BOOLEAN_OBJ
-        else:
-            res = EvalConstants.TRUE_BOOLEAN_OBJ
+            return EvalConstants.FALSE_BOOLEAN_OBJ
+        return EvalConstants.TRUE_BOOLEAN_OBJ
     elif isinstance(right, IntegerObj):
         if right.value > 0:
-            res = EvalConstants.FALSE_BOOLEAN_OBJ
-        else:
-            res = EvalConstants.TRUE_BOOLEAN_OBJ
+            return EvalConstants.FALSE_BOOLEAN_OBJ
+        return EvalConstants.TRUE_BOOLEAN_OBJ
     elif isinstance(right, NullObj):
-        res = EvalConstants.TRUE_BOOLEAN_OBJ
-
-
-    if isinstance(res, NullObj):
-        res.messages.append('eval_bang_operator')
+        return EvalConstants.TRUE_BOOLEAN_OBJ
     
-    return res
+    return EvalConstants.NULL_OBJ
 
+def eval_infix_expression(operator: str, left: Object, right: Object) -> Object:
+    if operator in ['+', '-', '*', '/', '>', '<', '!=', '==']:
+        # handle non integer cases
+        if not isinstance(left, IntegerObj):
+            return EvalConstants.NULL_OBJ
+        if not isinstance(right, IntegerObj):
+            return EvalConstants.NULL_OBJ
+        
+        if operator == '+':
+            return IntegerObj(left.value + right.value)
+        
+        if operator == '-':
+            return IntegerObj(left.value - right.value)
+        
+        if operator == '*':
+            return IntegerObj(left.value * right.value)
+        
+        if operator == '/':
+            return IntegerObj(left.value // right.value)
+        
+        if operator == '>':
+            return BooleanObj(left.value > right.value)
+        
+        if operator == '<':
+            return BooleanObj(left.value < right.value)
+        
+        if operator == '!=':
+            return BooleanObj(left.value != right.value)
+        
+        if operator == '==':
+            return BooleanObj(left.value == right.value)
+    
+    return EvalConstants.NULL_OBJ
+
+
+def eval_if_expression(exp: IfExpression):
+    condition = eval(exp.condition)
+
+    truthy = is_truthy(condition)
+    if isinstance(truthy, NullObj):
+        return truthy
+
+    if condition.value:
+        return eval(exp.consequence)
+    elif exp.alternative:
+        return eval(exp.alternative)
+
+    return EvalConstants.NULL_OBJ
+
+
+def is_truthy(obj: Object):
+    if isinstance(obj, NullObj):
+        return False
+    if isinstance(obj, BooleanObj):
+        return obj
+    if isinstance(obj, IntegerObj):
+        if obj.value > 0:
+            return EvalConstants.TRUE_BOOLEAN_OBJ
+        return EvalConstants.FALSE_BOOLEAN_OBJ
+    
+    return EvalConstants.NULL_OBJ

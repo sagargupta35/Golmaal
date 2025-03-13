@@ -28,6 +28,9 @@ class IntegerObj(Object):
     
     def inspect(self):
         return f"{self.value}"
+    
+    def __str__(self):
+        return self.inspect()
 
 class BooleanObj(Object):
 
@@ -39,20 +42,14 @@ class BooleanObj(Object):
     
     def inspect(self):
         return f"{self.value}"
-    
-class NullObj(Object):
-
-    def __init__(self):
-        self.messages = []
 
     def __str__(self):
-        res = ['NullObj:']
-        for message in self.messages:
-            res.append(f'{message} ->')
-        return ' '.join(res)
+        return self.inspect()
+    
+class NullObj(Object):
 
     def get_type(self):
         return ObjConstants.NULL_OBJ
     
     def inspect(self):
-        return str(self)
+        return 'NULL'

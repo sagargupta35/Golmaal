@@ -8,15 +8,30 @@ from sagar.my_object.object import *
 class TestEvaluator(unittest.TestCase):
 
     def test_eval_integer_expression(self):
-        inps = [("5", 5), ("10", 10), ('-5', -5), ('-10', -10), ('-0', 0)]
-        for (inp, exp) in inps:
+        inps = [("5", 5),
+                ("10", 10),
+                ("-5",-5),
+                ("-10",-10),
+                ("5 + 5 + 5 + 5- 10", 10),
+                ("2 * 2 * 2 * 2 * 2", 32),
+                ("-50 + 100 +-50", 0),
+                ("5 * 2 + 10", 20),
+                ("5 + 2 * 10", 25),
+                ("20 + 2 *-10", 0),
+                ("50 / 2 * 2 + 10", 60),
+                ("2 * (5 + 10)", 30),
+                ("3 * 3 * 3 + 10", 37),
+                ("3 * (3 * 3) + 10", 37),
+                ("(5 + 10 * 2 + 15 / 3) * 2 +-10", 50),
+            ]
+        for i, (inp, exp) in enumerate(inps):
             evaluated: Object = self.get_eval(inp)
-            self.validate_integer_obj(evaluated, exp)
+            self.validate_integer_obj(evaluated, exp, i)
 
-    def validate_integer_obj(self, obj: Object, value: int):
-        self.assertTrue(isinstance(obj, IntegerObj), f'obj is not an IntegerObj. It is a {str(obj)}')
+    def validate_integer_obj(self, obj: Object, value: int, idx: int = -1):
+        self.assertTrue(isinstance(obj, IntegerObj), f'obj -> {idx} is not an IntegerObj. It is a {str(obj)}')
         int_obj: IntegerObj = obj
-        self.assertTrue(int_obj.value == value, f'int_obj.value = {int_obj.value} != {value}')
+        self.assertTrue(int_obj.value == value, f'int_obj.value -> {idx} = {int_obj.value} != {value}')
 
 
     def test_eval_boolean_expression(self):
@@ -26,7 +41,16 @@ class TestEvaluator(unittest.TestCase):
             self.validate_boolean_obj(evaluated, exp, idx = i)
 
     def test_bang_operator(self):
-        inps = [('!true', False), ('!false', True), ('!5', False), ('!0', True), ('!!true', True), ('!!false', False)]
+        inps = [("true", True),
+                ("false", False),
+                ("1 < 2", True),
+                ("1 > 2", False),
+                ("1 < 1", False),
+                ("1 > 1", False),
+                ("1 == 1", True),
+                ("1 != 1", False),
+                ("1 == 2", False),
+                ("1 != 2", True),]
         for i, (inp, exp) in enumerate(inps):
             evaluated = self.get_eval(inp)
             self.validate_boolean_obj(evaluated, exp, idx = i)
@@ -36,6 +60,25 @@ class TestEvaluator(unittest.TestCase):
         bool_obj: BooleanObj = obj
         self.assertTrue(bool_obj.value == value, f'bool_obj.value->{idx} = {bool_obj.value} != {value}')        
 
+
+    def test_if_else_exp(self):
+        inps = [
+            ("if (true) { 10 }", 10),
+            ("if (false) { 10 }", None),
+            ("if (1) { 10 }", 10),
+            ("if (1 < 2) { 10 }", 10),
+            ("if (1 > 2) { 10 }", None),
+            ("if (1 > 2) { 10 } else { 20 }", 20),
+            ("if (1 < 2) { 10 } else { 20 }", 10),
+        ]
+
+        for i, (inp, exp) in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            if not exp:
+                if not isinstance(evaluated, NullObj):
+                    self.fail(f'evaluated is expected to be NullObj. It is {evaluated}')
+            else:
+                self.validate_integer_obj(evaluated, value=exp, idx=i)
 
 
     def get_eval(self, inp: str) -> Object:
