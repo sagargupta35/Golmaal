@@ -72,7 +72,6 @@ class Parser:
             stmt = self.parse_statement()
             if stmt:
                 stmts.append(stmt)
-            
             self.next_token()
         
         program.statements = stmts

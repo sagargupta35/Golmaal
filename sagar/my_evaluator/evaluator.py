@@ -62,13 +62,16 @@ class Evaluator:
             value = self.eval(node.value)
             if self.is_eror(value):
                 return value
-            
+            self.env.put(node.name.value, value)
+            return NullObj()
+
+        elif isinstance(node, Identifier):
+            return self.eval_identifier(node.value)
         
         return ErrorObj('cannot evaluate the statement')
 
 
     def eval_statements(self, statements: list[Statement]) -> Object:
-
         for statement in statements:
             res = self.eval(statement)
 
@@ -202,6 +205,12 @@ class Evaluator:
             return EvalConstants.FALSE_BOOLEAN_OBJ
         
         return ErrorObj('truth value cannont be extracted')
+    
+    def eval_identifier(self, name):
+        tup = self.env.get(name)
+        if not tup[1]:
+            return ErrorObj(f'identifier not found: {name}')
+        return tup[0]
 
 
     def is_eror(self, err: Object) -> bool:
