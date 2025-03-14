@@ -1,7 +1,7 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_evaluator.evaluator import eval
+from sagar.my_evaluator.evaluator import Evaluator
 from sagar.my_object.object import *
 
 
@@ -122,7 +122,8 @@ class TestEvaluator(unittest.TestCase):
                     return true + false;
                 }
                 return 1;
-            }''', 'unknown operator: BOOLEAN + BOOLEAN')
+            }''', 'unknown operator: BOOLEAN + BOOLEAN'),
+            # ('foobar', 'identifier not found: foobar')
         ]
 
         for i, (inp, exp) in enumerate(inps):
@@ -131,12 +132,26 @@ class TestEvaluator(unittest.TestCase):
             err_eval: ErrorObj = evaluated
             self.assertTrue(err_eval.message == exp, f'err_eval.message {i} = {err_eval.message} != {exp}')
 
+
+    # def test_let_statemtnts(self):
+    #     inps = [
+    #         ('let a = 5; a;', 5),
+    #         ('let a = 10; let b = 5; a+b;', 15),
+    #         ('let a = 5; let b = 6; let c = a + b; c-10;', 1)
+    #     ]
+
+    #     for i, (inp, exp) in enumerate(inps):
+    #         evaluated = self.get_eval(inp)
+    #         self.validate_integer_obj(evaluated, value=exp, idx=i)
+
+
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)
         p = Parser(l)
 
         program = p.parse_program()
-        return eval(program)
+        evaluator = Evaluator()
+        return evaluator.eval(program)
     
 
 if __name__ == '__main__':

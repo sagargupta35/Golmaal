@@ -77,3 +77,14 @@ class ErrorObj(Object):
     
     def inspect(self):
         return f'Error: {self.message}'
+    
+class Environment:
+    def __init__(self):
+        self.store = {}
+
+    def get(self, name):
+        return self.store.get(name, None), name in self.store
+
+    def set(self, name, val):
+        self.store[name] = val
+        return val

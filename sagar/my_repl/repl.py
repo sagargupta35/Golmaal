@@ -1,7 +1,7 @@
 from sagar.my_token.token import Token, Constants
 from sagar.lexer import Lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_evaluator.evaluator import eval
+from sagar.my_evaluator.evaluator import Evaluator
 
 PROMPT = ">>"
 
@@ -19,7 +19,8 @@ def start():
                 print(error)
             continue
         
-        evaluated = eval(program)
+        evaluator = Evaluator()
+        evaluated = evaluator.eval(program)
 
         print(str(evaluated.inspect()))
 
