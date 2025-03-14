@@ -85,6 +85,6 @@ class Environment:
     def get(self, name):
         return self.store.get(name, None), name in self.store
 
-    def set(self, name, val):
+    def put(self, name, val):
         self.store[name] = val
         return val
