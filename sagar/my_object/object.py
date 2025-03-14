@@ -19,6 +19,7 @@ class ObjConstants:
     BOOLEAN_OBJ = 'BOOLEAN'
     NULL_OBJ = 'NULL'
     RETURN_VALUE_OBJ = 'RETURN_VALUE'
+    ERROR_OBJ = 'ERROR'
 
 class IntegerObj(Object):
     def __init__(self, value: int):
@@ -66,3 +67,13 @@ class ReturnObj(Object):
 
     def inspect(self):
         return self.value.inspect()
+
+class ErrorObj(Object):
+    def __init__(self, message: str = ''):
+        self.message = message
+
+    def get_type(self):
+        return ObjConstants.ERROR_OBJ
+    
+    def inspect(self):
+        return f'Error: {self.message}'

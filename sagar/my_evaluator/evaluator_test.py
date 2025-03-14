@@ -35,14 +35,8 @@ class TestEvaluator(unittest.TestCase):
 
 
     def test_eval_boolean_expression(self):
-        inps = [('true', True), ('false', False)]
-        for i, (inp, exp) in enumerate(inps):
-            evaluated: Object = self.get_eval(inp)
-            self.validate_boolean_obj(evaluated, exp, idx = i)
-
-    def test_bang_operator(self):
-        inps = [("true", True),
-                ("false", False),
+        inps = [('true', True),
+                ('false', False),
                 ("1 < 2", True),
                 ("1 > 2", False),
                 ("1 < 1", False),
@@ -50,13 +44,25 @@ class TestEvaluator(unittest.TestCase):
                 ("1 == 1", True),
                 ("1 != 1", False),
                 ("1 == 2", False),
-                ("1 != 2", True),]
+                ("1 != 2", True), 
+               ]
+        for i, (inp, exp) in enumerate(inps):
+            evaluated: Object = self.get_eval(inp)
+            self.validate_boolean_obj(evaluated, exp, idx = i)
+
+    def test_bang_operator(self):
+        inps = [("!true", False),
+                ("!false", True),
+                ("!5", False),
+                ("!!true", True),
+                ("!!false", False),
+                ("!!5", True),]
         for i, (inp, exp) in enumerate(inps):
             evaluated = self.get_eval(inp)
             self.validate_boolean_obj(evaluated, exp, idx = i)
 
     def validate_boolean_obj(self, obj: Object, value: bool, idx: int = -1):
-        self.assertTrue(isinstance(obj, BooleanObj), f'obj is not an BooleanObj. It is a {str(obj)}')
+        self.assertTrue(isinstance(obj, BooleanObj), f'obj {idx} is not an BooleanObj. It is a {obj.get_type()}')
         bool_obj: BooleanObj = obj
         self.assertTrue(bool_obj.value == value, f'bool_obj.value->{idx} = {bool_obj.value} != {value}')        
 
@@ -100,6 +106,30 @@ class TestEvaluator(unittest.TestCase):
         for i, (inp, exp) in enumerate(inps):
             evaluated = self.get_eval(inp)
             self.validate_integer_obj(evaluated, exp, idx=i)
+
+
+    def test_error_handling(self):
+        inps = [
+            ('5+true;', 'type mismatch: INTEGER + BOOLEAN'),
+            ('5+true; 5;', 'type mismatch: INTEGER + BOOLEAN'),
+            ('-true', 'unknown operator: -BOOLEAN'),
+            ('true + false', 'unknown operator: BOOLEAN + BOOLEAN'),
+            ('5; true + false; 5;', 'unknown operator: BOOLEAN + BOOLEAN'),
+            ("if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN",),
+            ('''
+            if (10 > 1) {
+                if (10 > 1) {
+                    return true + false;
+                }
+                return 1;
+            }''', 'unknown operator: BOOLEAN + BOOLEAN')
+        ]
+
+        for i, (inp, exp) in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            self.assertTrue(isinstance(evaluated, ErrorObj), f'evaluated {i} is not an ErrorObj. Its a {type(evaluated)}')
+            err_eval: ErrorObj = evaluated
+            self.assertTrue(err_eval.message == exp, f'err_eval.message {i} = {err_eval.message} != {exp}')
 
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)
