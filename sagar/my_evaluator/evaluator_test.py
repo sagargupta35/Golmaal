@@ -1,7 +1,7 @@
 import unittest
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_evaluator.evaluator import Evaluator
+from sagar.my_evaluator.evaluator import eval
 from sagar.my_object.object import *
 
 
@@ -152,8 +152,7 @@ class TestEvaluator(unittest.TestCase):
         p = Parser(l)
 
         program = p.parse_program()
-        evaluator = Evaluator()
-        return evaluator.eval(program)
+        return eval(program, Environment())
     
 
 if __name__ == '__main__':

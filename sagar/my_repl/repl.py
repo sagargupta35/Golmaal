@@ -1,11 +1,13 @@
 from sagar.my_token.token import Token, Constants
 from sagar.lexer import Lexer
 from sagar.my_parser.parser import Parser
-from sagar.my_evaluator.evaluator import Evaluator
+from sagar.my_evaluator.evaluator import eval
+from sagar.my_object.object import Environment
 
 PROMPT = ">>"
 
 def start():
+    env = Environment()
     while True:
         line = input(PROMPT)
         if line == 'quit':
@@ -19,8 +21,7 @@ def start():
                 print(error)
             continue
         
-        evaluator = Evaluator()
-        evaluated = evaluator.eval(program)
+        evaluated = eval(program, env)
 
         print(str(evaluated.inspect()))
 
