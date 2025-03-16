@@ -174,8 +174,8 @@ class TestEvaluator(unittest.TestCase):
             self.validate_integer_obj(evaluated, value=exp, idx=i)
 
     def test_string_objects(self):
-        inps = ['"om sai ram";', '"sagar gupta";', '"foobar"']
-        exp = ['om sai ram', 'sagar gupta', 'foobar']
+        inps = ['"om sai ram";', '"sagar gupta";', '"foobar"', '"om sai" + " " + "ram"', '"sagar" + ""', '"sagar " + "gupta"']
+        exp = ['om sai ram', 'sagar gupta', 'foobar', 'om sai ram', 'sagar', 'sagar gupta']
         for i, inp in enumerate(inps):
             evaluated = self.get_eval(inp)
             self.assertTrue(isinstance(evaluated, StringObj), f'evaluated -> {i} is not an instance of StringObj. Its a {type(evaluated)}')

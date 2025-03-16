@@ -201,6 +201,10 @@ def eval_infix_expression(operator: str, left: Object, right: Object) -> Object:
         # handle non integer cases
         if type(left) != type(right):
             return ErrorObj(f'type mismatch: {left.get_type()} {operator} {right.get_type()}')
+        
+        #concatenate string
+        if isinstance(left, StringObj) and isinstance(right, StringObj) and operator == '+':
+            return StringObj(value=left.value + right.value)
 
         if not (isinstance(left, IntegerObj) and isinstance(right, IntegerObj)):
             return ErrorObj(f'unknown operator: {left.get_type()} {operator} {right.get_type()}')
