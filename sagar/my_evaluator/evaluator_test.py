@@ -146,6 +146,32 @@ class TestEvaluator(unittest.TestCase):
             evaluated = self.get_eval(inp)
             self.validate_integer_obj(evaluated, value=exp, idx=i)
 
+    def test_function_object(self):
+        inp = 'fn(x){return x+5;};'
+
+        evaluated = self.get_eval(inp)
+        self.assertTrue(isinstance(evaluated, FunctionObj), f'evaluated is not a FunctionObj. Its a {type(evaluated)} = {evaluated}')
+        fun: FunctionObj = evaluated
+
+        self.assertTrue(len(fun.params) == 1, f'len(fun.params) = {len(fun.params)} != 1')
+        self.assertTrue(str(fun.params[0]) == 'x', f'str(fun.params[0]) = {str(fun.params[0])} != "x"')
+        
+        body_str_exp = 'return (x + 5)'
+        self.assertTrue(str(fun.body) == body_str_exp, f'str(fun.body) = {str(fun.body)} != {body_str_exp}')
+
+
+    def test_call_expression(self):
+        inps = [
+            ("let identity = fn(x) { x; }; identity(5);", 5),
+            ("let identity = fn(x) { return x; }; identity(5);", 5),
+            ("let double = fn(x) { x * 2; }; double(5);", 10),
+            ("let add = fn(x, y) { x + y; }; add(5, 5);", 10),
+            ("let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20),
+            ("fn(x) { x; }(5)", 5)
+        ]
+        for i, (inp, exp) in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            self.validate_integer_obj(evaluated, value=exp, idx=i)
 
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)

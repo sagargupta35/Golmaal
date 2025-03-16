@@ -29,16 +29,16 @@ def eval(node: Node, env: Environment) -> Object:
     
     elif isinstance(node, PrefixExpression):
         right = eval(node.right, env)
-        if is_eror(right):
+        if is_error(right):
             return right
         return eval_prefix_expression(node.operator, right)
     
     elif isinstance(node, InfixExpression):
         left = eval(node.left, env)
-        if is_eror(left):
+        if is_error(left):
             return left
         right = eval(node.right, env)
-        if is_eror(right):
+        if is_error(right):
             return right
         return eval_infix_expression(node.operator, left, right)
 
@@ -50,21 +50,76 @@ def eval(node: Node, env: Environment) -> Object:
     
     elif isinstance(node, ReturnStatement):
         value = eval(node.value, env)
-        if is_eror(value):
+        if is_error(value):
             return value
         return ReturnObj(value=value)
     
     elif isinstance(node, LetStatement):
         value = eval(node.value, env)
-        if is_eror(value):
+        if is_error(value):
             return value
         env.put(node.name.value, value)
         return NullObj()
 
-    elif isinstance(node, Identifier):
+    elif isinstance(node, Identifier):        
         return eval_identifier(node.value, env)
     
+    elif isinstance(node, FunctionLiteral):
+        return FunctionObj(params=node.parameters, body=node.body, env=env)
+    
+    elif isinstance(node, CallExpression):
+        fun = eval(node.function, env)
+        if is_error(fun):
+            return fun
+        args = eval_arguments(node.arguments, env)
+        if len(args) == 1 and is_error(args[0]):
+            return args
+        return apply_fun(fun, args)
+          
     return ErrorObj('cannot evaluate the statement')
+
+
+def apply_fun(fun: Object, args: list[Object]) -> Object:
+
+    if not isinstance(fun, FunctionObj):
+        return ErrorObj(f'not a function: {str(fun)}')
+
+    extended_env = get_extended_env(fun, args)
+
+    if is_error(extended_env):
+        return extended_env
+    
+    evaluated = eval_block_statements(fun.body.statements, env = extended_env)
+
+    return unwrap_return_value(evaluated)
+    
+
+def get_extended_env(fun: FunctionObj, args: list[Object]):
+    extended_env = Environment.new_enclosing_environment(fun.env)
+    
+    if len(fun.params) != len(args):
+        return ErrorObj(f'expected {len(fun.params)} arguments. but passed {len(args)}.')
+
+    for i, param in enumerate(fun.params):
+        extended_env.put(param.value, args[i])
+
+    return extended_env
+    
+def unwrap_return_value(ret: Object) -> Object:
+    if not isinstance(ret, ReturnObj):
+        return ret
+    
+    return ret.value
+
+
+def eval_arguments(args: list[Expression], env: Environment) -> list[Object]:
+    res = []
+    for arg in args:
+        evaluated = eval(arg, env)
+        if is_error(evaluated):
+            return [evaluated]
+        res.append(evaluated)
+    return res
 
 
 def eval_statements(statements: list[Statement], env: Environment) -> Object:
@@ -80,6 +135,7 @@ def eval_statements(statements: list[Statement], env: Environment) -> Object:
     return res
 
 def eval_block_statements(statements: list[Statement], env: Environment) -> Object:
+
     for statement in statements:
         res = eval(statement, env)
 
@@ -90,7 +146,7 @@ def eval_block_statements(statements: list[Statement], env: Environment) -> Obje
 
 def eval_prefix_expression(operator: str, right: Object) -> Object:
 
-    if is_eror(right):
+    if is_error(right):
         return right
 
     if operator == '!':
@@ -103,7 +159,7 @@ def eval_prefix_expression(operator: str, right: Object) -> Object:
 
 def eval_minus_operator(right: Object) -> Object:
 
-    if is_eror(right):
+    if is_error(right):
         return right
 
     if isinstance(right, IntegerObj):
@@ -113,7 +169,7 @@ def eval_minus_operator(right: Object) -> Object:
 
 def eval_bang_operator(right: Object) -> Object:
     
-    if is_eror(right):
+    if is_error(right):
         return right
 
     if isinstance(right, BooleanObj):
@@ -132,10 +188,10 @@ def eval_bang_operator(right: Object) -> Object:
 def eval_infix_expression(operator: str, left: Object, right: Object) -> Object:
     if operator in ['+', '-', '*', '/', '>', '<', '!=', '==']:
 
-        if is_eror(left):
+        if is_error(left):
             return left
         
-        if is_eror(right):
+        if is_error(right):
             return right
 
         # handle non integer cases
@@ -175,11 +231,11 @@ def eval_infix_expression(operator: str, left: Object, right: Object) -> Object:
 def eval_if_expression(exp: IfExpression, env: Environment):
     condition = eval(exp.condition, env)
 
-    if is_eror(condition):
+    if is_error(condition):
         return condition
 
     truthy = is_truthy(condition)
-    if is_eror(truthy):
+    if is_error(truthy):
         return truthy
 
     if condition.value:
@@ -203,11 +259,10 @@ def is_truthy(obj: Object):
     return ErrorObj('truth value cannont be extracted')
 
 def eval_identifier(name, env: Environment):
-    tup = env.get(name)
-    if not tup[1]:
-        return ErrorObj(f'identifier not found: {name}')
-    return tup[0]
+    res = env.get(name)
+    if res:
+        return res
+    return ErrorObj(f'identifier not found: {name}')
 
-
-def is_eror(err: Object) -> bool:
+def is_error(err: Object) -> bool:
     return err and isinstance(err, ErrorObj)

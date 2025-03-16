@@ -189,7 +189,7 @@ class BlockStatement(Statement):
         return self.token.literal
     
     def __str__(self):
-        return "".join(str(s) for s in self.statements)
+        return "; ".join(str(s) for s in self.statements)
     
 class IfExpression(Expression):
     def __init__(self, token: Token, condition: Expression, consequence: BlockStatement, alternative: BlockStatement):
