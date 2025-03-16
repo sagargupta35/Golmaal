@@ -248,3 +248,15 @@ class CallExpression(Expression):
             ')'
         ]
         return ''.join(res)
+    
+class StringExpression(Expression):
+    def __init__(self, token: Token):
+        self.token = token
+        self.value = token.literal
+    
+    def token_literal(self):
+        return self.token.literal
+    
+    def expression_node(self):
+        return
+        

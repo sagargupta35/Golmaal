@@ -23,6 +23,7 @@ class ObjConstants:
     RETURN_VALUE_OBJ = 'RETURN_VALUE'
     ERROR_OBJ = 'ERROR'
     FUNCTION_OBJ = 'FUNCTION'
+    STRING_OBJ = 'STRING'
 
 class IntegerObj(Object):
     def __init__(self, value: int):
@@ -127,4 +128,16 @@ class FunctionObj(Object):
 
     def __str__(self):
         return self.inspect()
+        
+
+class StringObj(Object):
+    def __init__(self, value: str):
+        self.value = value
+    
+    def get_type(self):
+        return ObjConstants.STRING_OBJ
+    
+    def inspect(self):
+        return f'"{self.value}"'
+
         

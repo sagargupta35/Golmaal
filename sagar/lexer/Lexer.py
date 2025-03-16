@@ -77,6 +77,9 @@ class Lexer:
                 tok = Token(con.GT, '>')
             case '*':
                 tok = Token(con.ASTERISK, '*')
+            case '"':
+                literal = self.read_string()
+                tok = Token(con.STRING, literal)
             case 0:
                 tok = Token(con.EOF, '')
             case _:
@@ -93,6 +96,14 @@ class Lexer:
 
         self.read_char()
         return tok
+    
+    def read_string(self):
+        pos = self.position + 1
+        while True:
+            self.read_char()
+            if self.ch == '"' or self.ch == 0:
+                break
+        return self.input[pos:self.position]
 
     
     def skip_whitespace(self):

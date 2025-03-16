@@ -44,6 +44,7 @@ class Constants:
     FALSE = "FALSE"
     IF = "IF"
     ELSE = "ELSE"
+    STRING = 'STRING'
 
 two_char_ops = {
     '==': Constants.EQ,

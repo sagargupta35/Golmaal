@@ -389,6 +389,29 @@ class TestParser(unittest.TestCase):
                     self.validate_infix_expression(args[2], 4, '+', 8)
 
 
+    def test_string_literal(self):
+        inps = ['"foobar";', '"sagar gupta";', '"om sai ram";']
+        exp = ['foobar', 'sagar gupta', 'om sai ram']
+        for i, inp in enumerate(inps):
+            l = new_lexer(inp)
+            p = Parser(l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            self.assertTrue(len(program.statements) == 1, f'len(program.statements) = {len(program.statements)} != 1')
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f'type(stmt) = {type(stmt)} != ExpressionStatement')
+            exp_stmt: ExpressionStatement = stmt
+            self.validate_string_literal(exp_stmt.expression, exp[i], idx = i)            
+
+    def validate_string_literal(self, exp: Expression, value: str, idx: int = -1):
+        self.assertTrue(isinstance(exp, StringExpression), f'exp -> {idx} is not a StringExpression. Its a {type(exp)}')
+        str_exp: StringExpression = exp
+        self.assertTrue(str_exp.value == value, f'str_exp.value -> {idx} = {str_exp.value} != {value}')
+
+
     def check_parse_errors(self, p: Parser):
         errors = p.errors
 

@@ -75,6 +75,10 @@ def eval(node: Node, env: Environment) -> Object:
         if len(args) == 1 and is_error(args[0]):
             return args
         return apply_fun(fun, args)
+    
+    elif isinstance(node, StringExpression):
+        str_obj = StringObj(node.value)
+        return str_obj
           
     return ErrorObj('cannot evaluate the statement')
 

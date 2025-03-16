@@ -173,6 +173,15 @@ class TestEvaluator(unittest.TestCase):
             evaluated = self.get_eval(inp)
             self.validate_integer_obj(evaluated, value=exp, idx=i)
 
+    def test_string_objects(self):
+        inps = ['"om sai ram";', '"sagar gupta";', '"foobar"']
+        exp = ['om sai ram', 'sagar gupta', 'foobar']
+        for i, inp in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            self.assertTrue(isinstance(evaluated, StringObj), f'evaluated -> {i} is not an instance of StringObj. Its a {type(evaluated)}')
+            str_eval: StringObj = evaluated
+            self.assertTrue(str_eval.value == exp[i], f'str_eval.value -> {i} = {str_eval.value} != {exp[i]}')    
+
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)
         p = Parser(l)

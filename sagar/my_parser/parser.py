@@ -47,6 +47,7 @@ class Parser:
         self.prefix_parsing_fns[Constants.LPAREN] = self.parse_grouped_expression
         self.prefix_parsing_fns[Constants.IF] = self.parse_if_expression
         self.prefix_parsing_fns[Constants.FUNCTION] = self.parse_function_literal
+        self.prefix_parsing_fns[Constants.STRING] = self.parse_string_literal
 
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
@@ -292,6 +293,9 @@ class Parser:
         
         call_exp.arguments = args
         return call_exp
+    
+    def parse_string_literal(self) -> StringExpression:
+        return StringExpression(self.cur_token)
 
     def ensure_identifier_naming_convention(self, name) -> False:
         if type(name) is not str:
