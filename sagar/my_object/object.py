@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from sagar.my_ast.ast import Identifier, BlockStatement
+from typing import Callable
 
 ObjectType = str
 
@@ -94,7 +95,7 @@ class Environment:
     def get(self, name):
 
         if name in self.store:
-            return self.store[name]
+            return self.store.get(name, None)
 
         if self.outer:
             return self.outer.get(name)
@@ -139,5 +140,15 @@ class StringObj(Object):
     
     def inspect(self):
         return f'"{self.value}"'
+
+    def __str__(self):
+        return self.inspect()
+    
+class Builtin:
+    def __init__(self, fn: Callable[..., Object]):
+        self.fn: Callable[..., Object] = fn
+
+def null_function(*args):
+    return NullObj()
 
         

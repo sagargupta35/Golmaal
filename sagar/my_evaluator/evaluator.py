@@ -9,6 +9,18 @@ class EvalConstants:
     NULL_OBJ = NullObj()
 
 
+def __length(args: list[Object]) -> Object:
+    if len(args) != 1:
+        return ErrorObj(f"wrong number of arguments. got={len(args)}, want=1")
+    arg: Object = args[0]
+    if isinstance(arg, StringObj):
+        return IntegerObj(len(arg.value))
+    return ErrorObj(f"argument to 'len' not supported, got {arg.get_type()}")
+
+builtins = {
+    'len': Builtin(__length)
+}
+
 
 def eval(node: Node, env: Environment) -> Object:
     
@@ -85,17 +97,21 @@ def eval(node: Node, env: Environment) -> Object:
 
 def apply_fun(fun: Object, args: list[Object]) -> Object:
 
-    if not isinstance(fun, FunctionObj):
-        return ErrorObj(f'not a function: {str(fun)}')
+    if isinstance(fun, FunctionObj):
 
-    extended_env = get_extended_env(fun, args)
+        extended_env = get_extended_env(fun, args)
 
-    if is_error(extended_env):
-        return extended_env
+        if is_error(extended_env):
+            return extended_env
+        
+        evaluated = eval_block_statements(fun.body.statements, env = extended_env)
+
+        return unwrap_return_value(evaluated)
     
-    evaluated = eval_block_statements(fun.body.statements, env = extended_env)
-
-    return unwrap_return_value(evaluated)
+    elif isinstance(fun, Builtin):
+        return fun.fn(args)
+    
+    return ErrorObj(f'not a function: {str(fun)}')
     
 
 def get_extended_env(fun: FunctionObj, args: list[Object]):
@@ -268,6 +284,9 @@ def is_truthy(obj: Object):
 
 def eval_identifier(name, env: Environment):
     res = env.get(name)
+    if res:
+        return res
+    res = builtins.get(name, None)
     if res:
         return res
     return ErrorObj(f'identifier not found: {name}')

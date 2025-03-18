@@ -29,8 +29,6 @@ class TestEvaluator(unittest.TestCase):
             self.validate_integer_obj(evaluated, exp, i)
 
     def validate_integer_obj(self, obj: Object, value: int, idx: int = -1):
-        if isinstance(obj, ErrorObj):
-            print(obj.message)
         self.assertTrue(isinstance(obj, IntegerObj), f'obj -> {idx} is not an IntegerObj. It is a {type(obj)}')
         int_obj: IntegerObj = obj
         self.assertTrue(int_obj.value == value, f'int_obj.value -> {idx} = {int_obj.value} != {value}')
@@ -150,7 +148,7 @@ class TestEvaluator(unittest.TestCase):
         inp = 'fn(x){return x+5;};'
 
         evaluated = self.get_eval(inp)
-        self.assertTrue(isinstance(evaluated, FunctionObj), f'evaluated is not a FunctionObj. Its a {type(evaluated)} = {evaluated}')
+        self.assertTrue(isinstance(evaluated, FunctionObj), f'evaluated is not a FunctionObj. Its a {type(evaluated)}')
         fun: FunctionObj = evaluated
 
         self.assertTrue(len(fun.params) == 1, f'len(fun.params) = {len(fun.params)} != 1')
@@ -181,6 +179,26 @@ class TestEvaluator(unittest.TestCase):
             self.assertTrue(isinstance(evaluated, StringObj), f'evaluated -> {i} is not an instance of StringObj. Its a {type(evaluated)}')
             str_eval: StringObj = evaluated
             self.assertTrue(str_eval.value == exp[i], f'str_eval.value -> {i} = {str_eval.value} != {exp[i]}')    
+
+    def test_len_function(self):
+        tests = [
+            ('len("")', 0),
+            ('len("four")', 4),
+            ('len("hello world")', 11),
+            ('len(1)', "argument to 'len' not supported, got INTEGER"),
+            ('len("one", "two")', "wrong number of arguments. got=2, want=1"),
+        ]
+
+        for i, (test, exp) in enumerate(tests):
+            evaluated = self.get_eval(test)
+
+            if isinstance(exp, int):
+                self.validate_integer_obj(evaluated, exp, idx = i)
+            elif isinstance(exp, str):
+                self.assertTrue(isinstance(evaluated, ErrorObj), f'evaluated -> {i} is not an ErrorObj. Its a {type(evaluated)}')
+                error: ErrorObj = evaluated
+                self.assertTrue(error.message == exp, f'error.message -> {i} = {error.message} != {exp}')
+
 
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)
