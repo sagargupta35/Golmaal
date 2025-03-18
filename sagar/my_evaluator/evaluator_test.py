@@ -199,6 +199,19 @@ class TestEvaluator(unittest.TestCase):
                 error: ErrorObj = evaluated
                 self.assertTrue(error.message == exp, f'error.message -> {i} = {error.message} != {exp}')
 
+    def test_array_literals(self):
+        inp = '[1, 2 * 2, 3 + 3]'
+
+        evaluated = self.get_eval(inp)
+        self.assertTrue(isinstance(evaluated, ArrayObj), f'evaluated is not an ArrayObj. Its a {type(evaluated)}')
+
+        arr: ArrayObj = evaluated
+        self.assertTrue(len(arr.elements) == 3, f'len(arr.elements) = {len(arr.elements)} != 3')
+
+        self.validate_integer_obj(arr.elements[0], 1, 0)
+        self.validate_integer_obj(arr.elements[1], 4, 1)
+        self.validate_integer_obj(arr.elements[2], 6, 2)
+
 
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)

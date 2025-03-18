@@ -91,6 +91,13 @@ def eval(node: Node, env: Environment) -> Object:
     elif isinstance(node, StringExpression):
         str_obj = StringObj(node.value)
         return str_obj
+    
+    elif isinstance(node, ArrayLiteral):
+        elements = eval_arguments(node.elements, env)
+        if len(elements) == 1 and is_error(elements[0]):
+            return elements[0]
+        arr_obj = ArrayObj(elements=elements)
+        return arr_obj
           
     return ErrorObj('cannot evaluate the statement')
 

@@ -25,6 +25,7 @@ class ObjConstants:
     ERROR_OBJ = 'ERROR'
     FUNCTION_OBJ = 'FUNCTION'
     STRING_OBJ = 'STRING'
+    ARRAY_OBJ = 'ARRAY'
 
 class IntegerObj(Object):
     def __init__(self, value: int):
@@ -151,4 +152,16 @@ class Builtin:
 def null_function(*args):
     return NullObj()
 
+class ArrayObj(Object):
+    def __init__(self, elements: list[Object]):
+        self.elements: list[Object] = elements
+
+    def get_type(self):
+        return ObjConstants.ARRAY_OBJ
+    
+    def inspect(self):
+        return f'[{', '.join(list(map(str, self.elements)))}]'
+    
+    def __str__(self):
+        return self.inspect()
         

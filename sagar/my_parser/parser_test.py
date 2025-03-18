@@ -6,6 +6,7 @@ from sagar.my_token.token import Token, Constants
 
 
 class TestParser(unittest.TestCase):
+    
     def test_let_statement(self):
         inp = '''
             let five = 5;
@@ -184,7 +185,8 @@ class TestParser(unittest.TestCase):
                 ("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"), ("true", "True"),\
                 ("false", "False"), ("3 > 5 == False", "((3 > 5) == False)"), ("3 < 5 == True", "((3 < 5) == True)"),\
                 ("1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"), ("(5 + 5) * 2", "((5 + 5) * 2)"), 
-                ("2 / (5 + 5)","(2 / (5 + 5))",), ("-(5 + 5)", "(-(5 + 5))"), ("!(true == true)","(!(True == True))"),]
+                ("2 / (5 + 5)","(2 / (5 + 5))",), ("-(5 + 5)", "(-(5 + 5))"), ("!(true == true)","(!(True == True))"),\
+                ("add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",)]
 
         for inp, expexted in tests:
             l = new_lexer(inp)
@@ -442,6 +444,25 @@ class TestParser(unittest.TestCase):
                     self.validate_infix_expression(array.elements[1], 1, '*', 2)
                     self.assertTrue(isinstance(array.elements[2], FunctionLiteral), f'array.elements[2] is not a FunctionLiteral. Its a {type(array.elements[2])}')
                     self.validate_boolean_expression(array.elements[3], False)
+
+    def test_index_expression(self):
+        inp = 'myarray[1+2]'
+
+        l = new_lexer(inp)
+        p = Parser(l)
+        program = p.parse_program()
+        self.check_parse_errors(p)
+
+        self.assertTrue(len(program.statements) == 1, f'len(program.statements) = {len(program.statements)} != 1')
+        stmt = program.statements[0]
+        self.assertTrue(isinstance(stmt, ExpressionStatement), f'stmt is not an ExpressionStatement. Its a {type(stmt)}')
+        
+        exp_stmt: ExpressionStatement = stmt
+        self.assertTrue(isinstance(exp_stmt.expression, IndexExpression), f'exp_stmt.expression is not an IndexExpression. Its a {type(exp_stmt.expression)}')
+        index_exp: IndexExpression = exp_stmt.expression
+
+        self.validate_identifier_expression(index_exp.left, 'myarray')
+        self.validate_infix_expression(index_exp.index, 1, '+', 2)
 
 
 

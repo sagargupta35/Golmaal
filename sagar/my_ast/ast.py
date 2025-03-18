@@ -274,5 +274,21 @@ class ArrayLiteral(Expression):
     
     def __str__(self):
         return  f'[{', '.join(list(map(str, self.elements)))}]'
+
+class IndexExpression(Expression):
+    def __init__(self, tok: Token, left: Expression, index: Expression):
+        self.token: Token = tok
+        self.left: Expression = left
+        self.index: Expression = index
+
+    def expression_node(self):
+        return
+    
+    def token_literal(self):
+        return self.token.token_type
+    
+    def __str__(self):
+        return f'({str(self.left)}[{str(self.index)}])'
+        
         
         

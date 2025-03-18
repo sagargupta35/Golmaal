@@ -14,6 +14,7 @@ SUM = 4
 PRODUCT = 5
 PREFIX = 6
 CALL = 7
+INDEX = 8
 
 precedences: dict[TokenType, int] = {
     Constants.EQ: EQUALS,
@@ -24,7 +25,8 @@ precedences: dict[TokenType, int] = {
     Constants.MINUS: SUM,
     Constants.SLASH: PRODUCT,
     Constants.ASTERISK: PRODUCT,
-    Constants.LPAREN: CALL
+    Constants.LPAREN: CALL,
+    Constants.LBRACKET: INDEX
 }
 
 class Parser:
@@ -55,6 +57,7 @@ class Parser:
             self.infix_parsing_fns[infix_op] = self.parse_infix_expression
         
         self.infix_parsing_fns[Constants.LPAREN] = self.parse_lparen_infix
+        self.infix_parsing_fns[Constants.LBRACKET] = self.parse_lbracket_infix
 
     def peek_precedence(self):
         return precedences.get(self.peek_token.token_type, LOWEST)
@@ -155,7 +158,6 @@ class Parser:
         if prefix == None:
             self.errors.append(f"no prefix parsing function found for {self.cur_token.token_type}")
             return None
-        
         left_exp = prefix()
 
         while self.peek_token != Constants.SEMICOLON and self.peek_precedence() > precedence:
@@ -329,6 +331,21 @@ class Parser:
             return None
         
         return res
+    
+    def parse_lbracket_infix(self, left: Expression):
+        ie = IndexExpression(tok = self.cur_token, left=left, index=None)
+
+        self.next_token()
+
+        index = self.parse_expression(LOWEST)
+        ie.index = index
+
+        self.next_token()
+        if self.cur_token.token_type != Constants.RBRACKET:
+            return None
+
+        return ie
+
     
 
 
