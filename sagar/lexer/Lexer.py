@@ -80,6 +80,10 @@ class Lexer:
             case '"':
                 literal = self.read_string()
                 tok = Token(con.STRING, literal)
+            case '[':
+                tok = Token(con.LBRACKET, '[')
+            case ']':
+                tok = Token(con.RBRACKET, ']')
             case 0:
                 tok = Token(con.EOF, '')
             case _:

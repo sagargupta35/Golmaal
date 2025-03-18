@@ -259,4 +259,20 @@ class StringExpression(Expression):
     
     def expression_node(self):
         return
+
+
+class ArrayLiteral(Expression):
+    def __init__(self, tok: Token, elements: list[Expression]):
+        self.token: Token = tok
+        self.elements: list[Expression] = elements
+    
+    def expression_node(self):
+        return
+    
+    def token_literal(self):
+        return self.token.literal
+    
+    def __str__(self):
+        return  f'[{', '.join(list(map(str, self.elements)))}]'
+        
         

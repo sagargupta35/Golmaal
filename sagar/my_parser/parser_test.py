@@ -411,6 +411,39 @@ class TestParser(unittest.TestCase):
         str_exp: StringExpression = exp
         self.assertTrue(str_exp.value == value, f'str_exp.value -> {idx} = {str_exp.value} != {value}')
 
+    def test_array_literals(self):
+        inps = [
+            '[]',
+            '[1, 1*2, fn(x, y){x+y}, false]'
+        ]
+
+        for i, inp in enumerate(inps):
+            l = new_lexer(inp)
+            p = Parser(l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            self.assertTrue(len(program.statements) == 1, f'len(program.statements) = {len(program.statements)} != 1')
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, ExpressionStatement), f'stmt {i} is not an ExpressionStatement. Its a {type(stmt)}')
+            exp_stmt: ExpressionStatement = stmt
+
+            self.assertTrue(isinstance(exp_stmt.expression, ArrayLiteral), f'exp_stmt.expression {i} is not an ArrayLiteral. Its a {type(exp_stmt.expression)}')
+            array: ArrayLiteral = exp_stmt.expression
+
+            match i:
+                case 0:
+                    self.assertTrue(len(array.elements) == 0, f'len(array.elements) = {len(array.elements)} != 0')
+                case 1:
+                    self.assertTrue(len(array.elements) == 4, f'len(array.elements) = {len(array.elements)} != 4')
+                    self.validate_integer_literal(array.elements[0], 1)
+                    self.validate_infix_expression(array.elements[1], 1, '*', 2)
+                    self.assertTrue(isinstance(array.elements[2], FunctionLiteral), f'array.elements[2] is not a FunctionLiteral. Its a {type(array.elements[2])}')
+                    self.validate_boolean_expression(array.elements[3], False)
+
+
 
     def check_parse_errors(self, p: Parser):
         errors = p.errors

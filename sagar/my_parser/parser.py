@@ -48,6 +48,7 @@ class Parser:
         self.prefix_parsing_fns[Constants.IF] = self.parse_if_expression
         self.prefix_parsing_fns[Constants.FUNCTION] = self.parse_function_literal
         self.prefix_parsing_fns[Constants.STRING] = self.parse_string_literal
+        self.prefix_parsing_fns[Constants.LBRACKET] = self.parse_array_literal
 
         infix_ops = ['+', '-', '==', '!=', '/', '*', '<', '>']
         for infix_op in infix_ops:
@@ -308,7 +309,26 @@ class Parser:
             if not is_letter_or_digit(c):
                 return False
         return True
+    
+    def parse_array_literal(self):
+        res = ArrayLiteral(self.cur_token, elements=None)
 
+        elements: list[Expression] = []
+
+        while self.cur_token.token_type not in [Constants.RBRACKET, Constants.EOF]:
+            self.next_token()
+            if self.cur_token.token_type in [Constants.RBRACKET, Constants.EOF]:
+                break
+            exp = self.parse_expression(LOWEST)
+            elements.append(exp)
+            self.next_token()
+        
+        res.elements = elements
+
+        if self.cur_token.token_type != Constants.RBRACKET:
+            return None
+        
+        return res
     
 
 

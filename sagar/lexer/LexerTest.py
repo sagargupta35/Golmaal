@@ -23,6 +23,7 @@ class TestNextToken(unittest.TestCase):
             10 != 9;
             "foobar"
             "foo bar"
+            [1, 2];
         '''
         con = Constants()
 
@@ -117,6 +118,12 @@ class TestNextToken(unittest.TestCase):
 
             (con.STRING, 'foobar'),
             (con.STRING, 'foo bar'),
+            (con.LBRACKET, '['),
+            (con.INT, '1'),
+            (con.COMMA, ','),
+            (con.INT, '2'),
+            (con.RBRACKET, ']'),
+            (con.SEMICOLON, ';'),
             (con.EOF, '')
         ]
 
