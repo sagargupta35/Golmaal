@@ -9,16 +9,30 @@ class EvalConstants:
     NULL_OBJ = NullObj()
 
 
-def __length(args: list[Object]) -> Object:
+def __length(args: list[Object], **kwargs) -> Object:
     if len(args) != 1:
         return ErrorObj(f"wrong number of arguments. got={len(args)}, want=1")
     arg: Object = args[0]
     if isinstance(arg, StringObj):
         return IntegerObj(len(arg.value))
+    elif isinstance(arg, ArrayObj):
+        return IntegerObj(len(arg.elements))
     return ErrorObj(f"argument to 'len' not supported, got {arg.get_type()}")
 
+def __print(args: list[Object], **kwargs) -> NullObj:
+    env = kwargs['env']
+    if not env:
+        return ErrorObj('no environment found to print')
+    if not isinstance(env, Environment):
+        return ErrorObj('no environment found to print')
+    for obj in args:
+        env.print(obj)
+    return NullObj()
+    
+
 builtins = {
-    'len': Builtin(__length)
+    'len': Builtin(__length),
+    'print': Builtin(__print)
 }
 
 
@@ -67,13 +81,15 @@ def eval(node: Node, env: Environment) -> Object:
         return ReturnObj(value=value)
     
     elif isinstance(node, LetStatement):
+        if not isinstance(node.value, Expression):
+            return ErrorObj(f'not an expression: {node.value.token_literal()}')
         value = eval(node.value, env)
         if is_error(value):
             return value
         env.put(node.name.value, value)
         return NullObj()
 
-    elif isinstance(node, Identifier):        
+    elif isinstance(node, Identifier): 
         return eval_identifier(node.value, env)
     
     elif isinstance(node, FunctionLiteral):
@@ -85,8 +101,8 @@ def eval(node: Node, env: Environment) -> Object:
             return fun
         args = eval_arguments(node.arguments, env)
         if len(args) == 1 and is_error(args[0]):
-            return args
-        return apply_fun(fun, args)
+            return args[0]
+        return apply_fun(fun, args, env)
     
     elif isinstance(node, StringExpression):
         str_obj = StringObj(node.value)
@@ -98,25 +114,28 @@ def eval(node: Node, env: Environment) -> Object:
             return elements[0]
         arr_obj = ArrayObj(elements=elements)
         return arr_obj
+    
+    elif isinstance(node, AssignmentStatement):
+        right = eval(node.right, env)
+        if is_error(right):
+            return right
+        ass_obj = AssignmentObj(node.left, right)
+        evaluated = eval_assignment(ass_obj, env)
+        return evaluated
           
     return ErrorObj('cannot evaluate the statement')
 
 
-def apply_fun(fun: Object, args: list[Object]) -> Object:
-
+def apply_fun(fun: Object, args: list[Object], env: Environment) -> Object:
     if isinstance(fun, FunctionObj):
-
         extended_env = get_extended_env(fun, args)
-
         if is_error(extended_env):
             return extended_env
-        
         evaluated = eval_block_statements(fun.body.statements, env = extended_env)
-
         return unwrap_return_value(evaluated)
     
     elif isinstance(fun, Builtin):
-        return fun.fn(args)
+        return fun.fn(args, env = env)
     
     return ErrorObj(f'not a function: {str(fun)}')
     
@@ -297,6 +316,17 @@ def eval_identifier(name, env: Environment):
     if res:
         return res
     return ErrorObj(f'identifier not found: {name}')
+
+def eval_assignment(obj: AssignmentObj, env: Environment):
+    if isinstance(obj.left, Identifier):
+        iden: Identifier = obj.left
+        prev = env.get(iden.value)
+        if not prev:
+            return ErrorObj(f'identifier not declared: {iden.value}')
+        env.put(iden.value, obj.right)
+        return EvalConstants.NULL_OBJ
+    
+    return ErrorObj(f'cannot assign value to {obj.inspect()}')
 
 def is_error(err: Object) -> bool:
     return err and isinstance(err, ErrorObj)

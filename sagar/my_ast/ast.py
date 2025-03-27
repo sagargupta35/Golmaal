@@ -195,7 +195,7 @@ class IfExpression(Expression):
     def __init__(self, token: Token, condition: Expression, consequence: BlockStatement, alternative: BlockStatement):
         self.token: Token = token
         self.condition: Expression = condition
-        self.consequence: BlockStatement = condition
+        self.consequence: BlockStatement = consequence
         self.alternative: BlockStatement = alternative
 
     def expression_node(self):
@@ -291,4 +291,14 @@ class IndexExpression(Expression):
         return f'({str(self.left)}[{str(self.index)}])'
         
         
-        
+class AssignmentStatement(Statement):
+    def __init__(self, token: Token, left: Identifier, right: Expression):
+        self.token: Token = token
+        self.left: Identifier = left
+        self.right: Expression = right
+
+    def statement_node(self):
+        return
+    
+    def token_literal(self):
+        return self.token.literal

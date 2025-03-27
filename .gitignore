@@ -50,3 +50,6 @@ __pycache__/
 
 # practice
 /practice.py
+
+# venv
+/venv/

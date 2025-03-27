@@ -26,6 +26,7 @@ class ObjConstants:
     FUNCTION_OBJ = 'FUNCTION'
     STRING_OBJ = 'STRING'
     ARRAY_OBJ = 'ARRAY'
+    ASSIGN_OBJ = 'ASSIGMENT'
 
 class IntegerObj(Object):
     def __init__(self, value: int):
@@ -85,9 +86,10 @@ class ErrorObj(Object):
         return f'Error: {self.message}'
     
 class Environment:
-    def __init__(self, outer: Environment | None = None):
+    def __init__(self, outer: Environment | None = None, print_statements: list[str] | None = None ):
         self.store = {}
         self.outer = outer
+        self.print_statements = print_statements
 
     @classmethod
     def new_enclosing_environment(cls, env: Environment):
@@ -106,6 +108,12 @@ class Environment:
     def put(self, name, val):
         self.store[name] = val
         return val
+    
+    def print(self, obj):
+        if self.print_statements is not None:
+            self.print_statements.append(obj.inspect())
+        else:
+            self.outer.print(obj)
     
 class FunctionObj(Object):
     def __init__(self, params: list[Identifier], body: BlockStatement, env: Environment):
@@ -140,7 +148,7 @@ class StringObj(Object):
         return ObjConstants.STRING_OBJ
     
     def inspect(self):
-        return f'"{self.value}"'
+        return f'{self.value}'
 
     def __str__(self):
         return self.inspect()
@@ -165,3 +173,16 @@ class ArrayObj(Object):
     def __str__(self):
         return self.inspect()
         
+class AssignmentObj(Object):
+    def __init__(self, left: Object, right: Object):
+        self.left = left
+        self.right = right
+
+    def get_type(self):
+        return ObjConstants.ASSIGN_OBJ
+    
+    def inspect(self):
+        return ' '.join([str(self.left), '=', str(self.right)])
+    
+    def __str__(self):
+        return self.inspect()

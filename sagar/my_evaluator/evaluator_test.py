@@ -123,7 +123,9 @@ class TestEvaluator(unittest.TestCase):
                 }
                 return 1;
             }''', 'unknown operator: BOOLEAN + BOOLEAN'),
-            ('foobar', 'identifier not found: foobar')
+            ('foobar', 'identifier not found: foobar'),
+            ('print(a)', 'identifier not found: a'),
+            
         ]
 
         for i, (inp, exp) in enumerate(inps):
@@ -211,6 +213,59 @@ class TestEvaluator(unittest.TestCase):
         self.validate_integer_obj(arr.elements[0], 1, 0)
         self.validate_integer_obj(arr.elements[1], 4, 1)
         self.validate_integer_obj(arr.elements[2], 6, 2)
+
+
+    def test_assignment_statement(self):
+        inps = [
+            ('let x = 10; x = 5; x;', 5),
+            ('let x = 10; x = x + 5; x;', 15),
+            ('let x = 10; let y = 20; x = y; x;', 20),
+            ('let x = 10; let y = 20; x = y + 10; x;', 30),
+            ('let x = 10; x = x * 2; x;', 20),
+            ('let x = 10; if (x > 5) { x = 15; }; x;', 15),
+            ('let x = 10; if (x < 5) { x = 15; } else { x = 20; }; x;', 20),
+            ('let x = 10; let y = 5; if (x > y) { x = x + y; }; x;', 15),
+            ('let x = 10; x = x - 5; x;', 5),
+            ('let x = 10; x = x / 2; x;', 5),
+            ('let x = 10; x = x + 5 * 2; x;', 20),
+            ('let x = 10; x = x + (5 * 2); x;', 20),
+            ('let x = 10; x = x + (5 * 2) - 5; x;', 15),
+            ('let x = 10; let y = 5; x = x + y * 2; x;', 20),
+            ('let x = 10; let y = 5; x = x + (y * 2); x;', 20),
+            ('let x = 10; let y = 5; x = x + (y * 2) - y; x;', 15),
+        ]
+
+        for i, (inp, exp) in enumerate(inps):
+            evaluated = self.get_eval(inp)
+            self.validate_integer_obj(evaluated, value=exp, idx=i)
+
+    def test_print_statements(self):
+        tests = [
+            ('let a = 10; print(a);', ['10']),
+            ('let a = 10; let b = 20; print(a, b);', ['10', '20']),
+            ('let a = 10; let b = 20; let c = a + b; print(c);', ['30']),
+            ('print("Hello, World!");', ['Hello, World!']),
+            ('let a = "Hello"; let b = "World"; print(a + " " + b);', ['Hello World']),
+            ('let a = [1, 2, 3]; print(a);', ['[1, 2, 3]']),
+            ('let a = fn(x) { x * 2; }; print(a(5));', ['10']),
+            ('if (true) { print("Condition is true"); }', ['Condition is true']),
+            ('if (false) { print("Condition is false"); } else { print("Condition is true"); }', ['Condition is true']),
+            ('let a = 10; if (a > 5) { print("a is greater than 5"); }', ['a is greater than 5']),
+            ('let a = 10; let b = 20; if (a < b) { print("a is less than b"); } else { print("a is not less than b"); }', ['a is less than b']),
+            ('let a = 10; let b = 20; print(a, b, a + b);', ['10', '20', '30']),
+            ('let a = 10; let b = 20; let c = a * b; print(a, b, c);', ['10', '20', '200']),
+            ('let a = 10; let b = 20; let c = a * b; print(a, b, c, c / a);', ['10', '20', '200', '20']),
+        ]
+
+        for i, (test, exp) in enumerate(tests):
+            env = Environment(print_statements=[])
+            l = new_lexer(test)
+            p = Parser(l)
+            program = p.parse_program()
+            eval(program, env)
+            self.assertTrue(len(env.print_statements) == len(exp), f'len(env.print_statements) -> {i} = {len(env.print_statements)} != {len(exp)}')
+            for j, s in enumerate(exp):
+                self.assertTrue(env.print_statements[j] == s, f'env.print_statements[{j}] = {env.print_statements[j]} != {s}')
 
 
     def get_eval(self, inp: str) -> Object:

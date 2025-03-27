@@ -77,15 +77,15 @@ class Lexer:
                 tok = Token(con.GT, '>')
             case '*':
                 tok = Token(con.ASTERISK, '*')
-            case '"':
-                literal = self.read_string()
-                tok = Token(con.STRING, literal)
             case '[':
                 tok = Token(con.LBRACKET, '[')
             case ']':
                 tok = Token(con.RBRACKET, ']')
             case 0:
                 tok = Token(con.EOF, '')
+            case '"':
+                literal = self.read_string()
+                tok = Token(con.STRING, literal)
             case _:
                 if is_letter_or_digit(self.ch):
                     word = self.read_word()

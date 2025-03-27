@@ -7,14 +7,15 @@ prefix_parsing_fn = Callable[[], Expression]
 infix_parsing_fn = Callable[[Expression], Expression]
 
 
-LOWEST = 1
-EQUALS = 2
-LESSGREATER = 3
-SUM = 4
-PRODUCT = 5
-PREFIX = 6
-CALL = 7
-INDEX = 8
+LOWEST       = 1   # Placeholder for unknown operations
+ASSIGNMENT   = 2   # =
+EQUALS       = 3   # ==, !=
+LESSGREATER  = 4   # <, >
+SUM          = 5   # +, -
+PRODUCT      = 6   # *, /
+PREFIX       = 7   # -X, !X
+CALL         = 8   # function calls: myFunction(x)
+INDEX        = 9   # array indexing: arr[0]
 
 precedences: dict[TokenType, int] = {
     Constants.EQ: EQUALS,
@@ -26,7 +27,8 @@ precedences: dict[TokenType, int] = {
     Constants.SLASH: PRODUCT,
     Constants.ASTERISK: PRODUCT,
     Constants.LPAREN: CALL,
-    Constants.LBRACKET: INDEX
+    Constants.LBRACKET: INDEX,
+    Constants.ASSIGN: EQUALS
 }
 
 class Parser:
@@ -58,6 +60,7 @@ class Parser:
         
         self.infix_parsing_fns[Constants.LPAREN] = self.parse_lparen_infix
         self.infix_parsing_fns[Constants.LBRACKET] = self.parse_lbracket_infix
+        self.infix_parsing_fns[Constants.ASSIGN] = self.parse_assignment_statment
 
     def peek_precedence(self):
         return precedences.get(self.peek_token.token_type, LOWEST)
@@ -145,10 +148,15 @@ class Parser:
     def parse_expression_statement(self) -> Statement:
         exp_stmt = ExpressionStatement(token = self.cur_token, expression = None)
 
-        exp_stmt.expression = self.parse_expression(LOWEST)
+        expression = self.parse_expression(LOWEST)
 
         if self.peek_token.token_type == Constants.SEMICOLON:
             self.next_token()
+
+        if isinstance(expression, AssignmentStatement):
+            return expression
+
+        exp_stmt.expression = expression
         
         return exp_stmt
     
@@ -255,7 +263,7 @@ class Parser:
 
         while self.cur_token.token_type not in  [Constants.EOF, Constants.RPAREN]:
             self.next_token()
-            #takes care for zero params or , after all params followed by ) while you are expecting an identifier
+            # takes care for zero params or , after all params followed by ) while you are expecting an identifier
             if self.cur_token.token_type in [Constants.RPAREN, Constants.EOF]: 
                 break
             params.append(self.parse_identifier())
@@ -345,6 +353,20 @@ class Parser:
             return None
 
         return ie
+    
+    def parse_assignment_statment(self, left: Expression) -> AssignmentStatement:
+        if not isinstance(left, Identifier):
+            return None
+        
+        ass_stm = AssignmentStatement(token=self.cur_token, left = left, right = None)
+        self.next_token()
+
+        right = self.parse_expression(LOWEST)
+        if right == None:
+            return None
+        ass_stm.right = right
+
+        return ass_stm
 
     
 

@@ -465,6 +465,73 @@ class TestParser(unittest.TestCase):
         self.validate_infix_expression(index_exp.index, 1, '+', 2)
 
 
+    def test_assignment_operation(self):
+        inps = [
+            'x = 10;',
+            'x = 10 * 9 + 3;',
+            'y = true;',
+            'z = "hello";',
+            'arr = [1, 2, 3];',
+            'x = fn(a, b) { a + b; };',
+            'nested = fn(x) { x = x + 1; };'
+        ]
+
+        for i, inp in enumerate(inps):
+            l = new_lexer(inp)
+            p = Parser(l)
+
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            self.assertTrue(len(program.statements) == 1, f'len(program.statements) = {len(program.statements)} != 1')
+            stmt = program.statements[0]
+
+            self.assertTrue(isinstance(stmt, AssignmentStatement), f'stmt {i} is not an AssignmentStatement. Its a {type(stmt)}')
+            assign_stmt: AssignmentStatement = stmt
+
+            match i:
+                case 0:
+                    self.validate_identifier_expression(assign_stmt.left, 'x')
+                    self.validate_integer_literal(assign_stmt.right, 10)
+                case 1:
+                    self.validate_identifier_expression(assign_stmt.left, 'x')
+                    self.assertTrue(isinstance(assign_stmt.right, InfixExpression), f'assign_stmt.value is not an InfixExpression. Its a {type(assign_stmt.right)}')
+                    self.assertTrue('((10 * 9) + 3)' == str(assign_stmt.right), f'assign_stmt.right = {assign_stmt.right} != ((10 * 9) + 3)')
+                case 2:
+                    self.validate_identifier_expression(assign_stmt.left, 'y')
+                    self.validate_boolean_expression(assign_stmt.right, True)
+                case 3:
+                    self.validate_identifier_expression(assign_stmt.left, 'z')
+                    self.validate_string_literal(assign_stmt.right, "hello")
+                case 4:
+                    self.validate_identifier_expression(assign_stmt.left, 'arr')
+                    self.assertTrue(isinstance(assign_stmt.right, ArrayLiteral), f'assign_stmt.right is not an ArrayLiteral. Its a {type(assign_stmt.right)}')
+                    self.assertTrue(len(assign_stmt.right.elements) == 3, f'len(assign_stmt.right.elements) = {len(assign_stmt.right.elements)} != 3')
+                    self.validate_integer_literal(assign_stmt.right.elements[0], 1)
+                    self.validate_integer_literal(assign_stmt.right.elements[1], 2)
+                    self.validate_integer_literal(assign_stmt.right.elements[2], 3)
+                case 5:
+                    self.validate_identifier_expression(assign_stmt.left, 'x')
+                    self.assertTrue(isinstance(assign_stmt.right, FunctionLiteral), f'assign_stmt.right is not a FunctionLiteral. Its a {type(assign_stmt.right)}')
+                    self.assertTrue(len(assign_stmt.right.parameters) == 2, f'len(assign_stmt.right.parameters) = {len(assign_stmt.right.parameters)} != 2')
+                    self.validate_identifier_expression(assign_stmt.right.parameters[0], 'a')
+                    self.validate_identifier_expression(assign_stmt.right.parameters[1], 'b')
+                    self.assertTrue(len(assign_stmt.right.body.statements) == 1, f'len(assign_stmt.right.body.statements) = {len(assign_stmt.right.body.statements)} != 1')
+                    body_stmt = assign_stmt.right.body.statements[0]
+                    self.assertTrue(isinstance(body_stmt, ExpressionStatement), f'body_stmt is not an ExpressionStatement. Its a {type(body_stmt)}')
+                    self.validate_infix_expression(body_stmt.expression, 'a', '+', 'b')
+                case 6:
+                    self.validate_identifier_expression(assign_stmt.left, 'nested')
+                    self.assertTrue(isinstance(assign_stmt.right, FunctionLiteral), f'assign_stmt.right is not a FunctionLiteral. Its a {type(assign_stmt.right)}')
+                    self.assertTrue(len(assign_stmt.right.parameters) == 1, f'len(assign_stmt.right.parameters) = {len(assign_stmt.right.parameters)} != 1')
+                    self.validate_identifier_expression(assign_stmt.right.parameters[0], 'x')
+                    self.assertTrue(len(assign_stmt.right.body.statements) == 1, f'len(assign_stmt.right.body.statements) = {len(assign_stmt.right.body.statements)} != 1')
+                    body_stmt = assign_stmt.right.body.statements[0]
+                    self.assertTrue(isinstance(body_stmt, AssignmentStatement), f'body_stmt is not an AssignmentStatement. Its a {type(body_stmt)}')
+                    self.validate_identifier_expression(body_stmt.left, 'x')
+                    self.assertTrue(isinstance(body_stmt.right, InfixExpression), f'body_stmt.right is not an InfixExpression. Its a {type(body_stmt.right)}')
+                    self.validate_infix_expression(body_stmt.right, 'x', '+', 1)
+
 
     def check_parse_errors(self, p: Parser):
         errors = p.errors
