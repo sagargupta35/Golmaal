@@ -1,2 +1,2 @@
 # Monkey
-Our First Interpreter
+Toy language
