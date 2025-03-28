@@ -83,7 +83,7 @@ class ErrorObj(Object):
         return ObjConstants.ERROR_OBJ
     
     def inspect(self):
-        return f'Error: {self.message}'
+        return self.message
     
 class Environment:
     def __init__(self, outer: Environment | None = None, print_statements: list[str] | None = None ):
