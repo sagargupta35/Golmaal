@@ -168,7 +168,7 @@ class ArrayObj(Object):
         return ObjConstants.ARRAY_OBJ
     
     def inspect(self):
-        return f'[{', '.join(list(map(str, self.elements)))}]'
+        return "[" + ", ".join(map(str, self.elements)) + "]"
     
     def __str__(self):
         return self.inspect()
