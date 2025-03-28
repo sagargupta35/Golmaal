@@ -3,6 +3,7 @@ from sagar.my_object.object import Environment
 from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
 from sagar.my_evaluator.evaluator import eval, is_error
+from waitress import serve
 
 
 app = Flask(__name__)
@@ -37,4 +38,4 @@ def receive_data():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    serve(app, host="0.0.0.0", port=8080)
