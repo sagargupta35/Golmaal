@@ -31,8 +31,8 @@ def __print(args: list[Object], **kwargs) -> NullObj:
     
 
 builtins = {
-    'len': Builtin(__length),
-    'print': Builtin(__print)
+    'len': Builtin(__length, name = 'len'),
+    'print': Builtin(__print, name = 'print')
 }
 
 
@@ -81,6 +81,8 @@ def eval(node: Node, env: Environment) -> Object:
         return ReturnObj(value=value)
     
     elif isinstance(node, LetStatement):
+        if node.name.value in builtins:
+            return ErrorObj(f'cannot override builtin function: {node.name.value}')
         if not isinstance(node.value, Expression):
             return ErrorObj(f'not an expression: {node.value.token_literal()}')
         value = eval(node.value, env)

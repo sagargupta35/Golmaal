@@ -23,9 +23,10 @@ def start():
         
         try:
             evaluated = eval(program, env)
-        except Exception:
-            print('cannot evaluate code')
+        except Exception as e:
+            print(e)
             env = Environment(print_statements=[])
+            continue
             
         if isinstance(evaluated, ErrorObj):
             print(evaluated.inspect())

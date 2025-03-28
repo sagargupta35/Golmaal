@@ -154,8 +154,12 @@ class StringObj(Object):
         return self.inspect()
     
 class Builtin:
-    def __init__(self, fn: Callable[..., Object]):
+    def __init__(self, fn: Callable[..., Object], name: str = 'not defined'):
         self.fn: Callable[..., Object] = fn
+        self.name = name
+    
+    def inspect(self):
+        return f"Builtin function : {self.name}"
 
 def null_function(*args):
     return NullObj()
