@@ -224,7 +224,7 @@ class FunctionLiteral(Expression):
         return self.token.literal
     
     def __str__(self):
-        return f'{self.token_literal()}({', '.join([str(param) for param in self.parameters])}){Constants.LBRACE} {str(self.body)} {Constants.RBRACE}'
+        return f"{self.token_literal()}({', '.join([str(param) for param in self.parameters])}){Constants.LBRACE} {str(self.body)} {Constants.RBRACE}"
     
 
 class CallExpression(Expression):
@@ -273,7 +273,7 @@ class ArrayLiteral(Expression):
         return self.token.literal
     
     def __str__(self):
-        return  f'[{', '.join(list(map(str, self.elements)))}]'
+        return  f"[{', '.join(list(map(str, self.elements)))}]"
 
 class IndexExpression(Expression):
     def __init__(self, tok: Token, left: Expression, index: Expression):
