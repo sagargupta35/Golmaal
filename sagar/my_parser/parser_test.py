@@ -533,6 +533,83 @@ class TestParser(unittest.TestCase):
                     self.validate_infix_expression(body_stmt.right, 'x', '+', 1)
 
 
+    def test_while_stmt(self):
+        inps = [
+            'let x = 10; while(x){x = x-1;}',
+            'let y = 5; while(y > 0){y = y - 1;}',
+            'let z = 0; while(z < 3){z = z + 1;}',
+            'let a = true; while(a){a = false;}',
+            'let b = 0; while(b < 10){if(b == 5){b = b + 2;} else {b = b + 1;}}'
+        ]
+
+        for i, test in enumerate(inps):
+            l = new_lexer(test)
+            p = Parser(l)
+            program = p.parse_program()
+            self.check_parse_errors(p)
+
+            match i:
+                case 0:
+                    self.assertTrue(len(program.statements) == 2, f'len(program.statements) = {len(program.statements)} != 2')
+                    stmt = program.statements[1]
+                    self.assertTrue(isinstance(stmt, WhileStatement), f'stmt is not a WhileStatement. Its a {type(stmt)}')
+                    whl_stmt: WhileStatement = stmt
+                    self.validate_identifier_expression(whl_stmt.condition, 'x')
+                    self.assertTrue(len(whl_stmt.body.statements) == 1, f'len(whl_stmt.body.statements) = {len(whl_stmt.body.statements)} != 1')
+                    self.assertTrue(isinstance(whl_stmt.body.statements[0], AssignmentStatement), f'whl_stmt.body.statements[0] is not an AssignmentStatement. Its a {type(whl_stmt.body.statements[0])}')
+                    ass_stmt: AssignmentStatement = whl_stmt.body.statements[0]
+                    self.validate_identifier_expression(ass_stmt.left, 'x')
+                    self.validate_infix_expression(ass_stmt.right, 'x', '-', 1)
+                case 1:
+                    self.assertTrue(len(program.statements) == 2, f'len(program.statements) = {len(program.statements)} != 2')
+                    stmt = program.statements[1]
+                    self.assertTrue(isinstance(stmt, WhileStatement), f'stmt is not a WhileStatement. Its a {type(stmt)}')
+                    whl_stmt: WhileStatement = stmt
+                    self.validate_infix_expression(whl_stmt.condition, 'y', '>', 0)
+                    self.assertTrue(len(whl_stmt.body.statements) == 1, f'len(whl_stmt.body.statements) = {len(whl_stmt.body.statements)} != 1')
+                    ass_stmt: AssignmentStatement = whl_stmt.body.statements[0]
+                    self.validate_identifier_expression(ass_stmt.left, 'y')
+                    self.validate_infix_expression(ass_stmt.right, 'y', '-', 1)
+                case 2:
+                    self.assertTrue(len(program.statements) == 2, f'len(program.statements) = {len(program.statements)} != 2')
+                    stmt = program.statements[1]
+                    self.assertTrue(isinstance(stmt, WhileStatement), f'stmt is not a WhileStatement. Its a {type(stmt)}')
+                    whl_stmt: WhileStatement = stmt
+                    self.validate_infix_expression(whl_stmt.condition, 'z', '<', 3)
+                    self.assertTrue(len(whl_stmt.body.statements) == 1, f'len(whl_stmt.body.statements) = {len(whl_stmt.body.statements)} != 1')
+                    ass_stmt: AssignmentStatement = whl_stmt.body.statements[0]
+                    self.validate_identifier_expression(ass_stmt.left, 'z')
+                    self.validate_infix_expression(ass_stmt.right, 'z', '+', 1)
+                case 3:
+                    self.assertTrue(len(program.statements) == 2, f'len(program.statements) = {len(program.statements)} != 2')
+                    stmt = program.statements[1]
+                    self.assertTrue(isinstance(stmt, WhileStatement), f'stmt is not a WhileStatement. Its a {type(stmt)}')
+                    whl_stmt: WhileStatement = stmt
+                    self.validate_identifier_expression(whl_stmt.condition, 'a')
+                    self.assertTrue(len(whl_stmt.body.statements) == 1, f'len(whl_stmt.body.statements) = {len(whl_stmt.body.statements)} != 1')
+                    ass_stmt: AssignmentStatement = whl_stmt.body.statements[0]
+                    self.validate_identifier_expression(ass_stmt.left, 'a')
+                    self.validate_boolean_expression(ass_stmt.right, False)
+                case 4:
+                    self.assertTrue(len(program.statements) == 2, f'len(program.statements) = {len(program.statements)} != 2')
+                    stmt = program.statements[1]
+                    self.assertTrue(isinstance(stmt, WhileStatement), f'stmt is not a WhileStatement. Its a {type(stmt)}')
+                    whl_stmt: WhileStatement = stmt
+                    self.validate_infix_expression(whl_stmt.condition, 'b', '<', 10)
+                    self.assertTrue(len(whl_stmt.body.statements) == 1, f'len(whl_stmt.body.statements) = {len(whl_stmt.body.statements)} != 1')
+                    if_stmt = whl_stmt.body.statements[0].expression
+                    self.assertTrue(isinstance(if_stmt, IfExpression), f'if_stmt is not an IfExpression. Its a {type(if_stmt)}')
+                    self.validate_infix_expression(if_stmt.condition, 'b', '==', 5)
+                    self.assertTrue(len(if_stmt.consequence.statements) == 1, f'len(if_stmt.consequence.statements) = {len(if_stmt.consequence.statements)} != 1')
+                    cons_stmt: AssignmentStatement = if_stmt.consequence.statements[0]
+                    self.validate_identifier_expression(cons_stmt.left, 'b')
+                    self.validate_infix_expression(cons_stmt.right, 'b', '+', 2)
+                    self.assertTrue(len(if_stmt.alternative.statements) == 1, f'len(if_stmt.alternative.statements) = {len(if_stmt.alternative.statements)} != 1')
+                    alt_stmt: AssignmentStatement = if_stmt.alternative.statements[0]
+                    self.validate_identifier_expression(alt_stmt.left, 'b')
+                    self.validate_infix_expression(alt_stmt.right, 'b', '+', 1)
+
+
     def check_parse_errors(self, p: Parser):
         errors = p.errors
 

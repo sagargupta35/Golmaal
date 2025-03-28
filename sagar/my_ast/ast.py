@@ -302,3 +302,15 @@ class AssignmentStatement(Statement):
     
     def token_literal(self):
         return self.token.literal
+
+class WhileStatement(Statement):
+    def __init__(self, token: Token, condition: Expression, body: BlockStatement):
+        self.token = token
+        self.condition = condition
+        self.body = body
+
+    def statement_node(self):
+        return
+    
+    def token_literal(self):
+        return self.token.literal

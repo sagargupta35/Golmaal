@@ -267,13 +267,48 @@ class TestEvaluator(unittest.TestCase):
             for j, s in enumerate(exp):
                 self.assertTrue(env.print_statements[j] == s, f'env.print_statements[{j}] = {env.print_statements[j]} != {s}')
 
+    def test_while_statement(self):
+        tests = [
+            'let x = 10; while(x){x = x-1;}; print(x);',
+            'let x = 5; let y = 0; while(x){y = y + x; x = x - 1;}; print(y);',
+            'let x = 0; while(x < 5){x = x + 1;}; print(x);',
+            'let x = 10; let y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, y);',
+            'let x = 3; let y = 1; while(x > 0){y = y * x; x = x - 1;}; print(y);',
+            'let x = 10; while(x > 0){if(x == 5){break;}; x = x - 1;}; print(x);',
+            'let x = 10; let y = 0; while(x > 0){if(x == 5){x = x - 1; continue;}; y = y + x; x = x - 1;}; print(y);',
+        ]
+        expected_outputs = [
+            ['0'],
+            ['15'],
+            ['5'],
+            ['5', '40'],
+            ['6'],
+            ['5'],
+            ['50'],
+        ]
+
+        for i, (test, exp) in enumerate(zip(tests, expected_outputs)):
+            env = Environment(print_statements=[])
+            l = new_lexer(test)
+            p = Parser(l)
+            program = p.parse_program()
+
+            evaluated = eval(program, env)
+            if isinstance(evaluated, ErrorObj):
+                print(evaluated.message)
+            self.assertTrue(isinstance(evaluated, NullObj), f'evaluated -> {i} is not a NullObj. Its a {type(evaluated)}')
+
+            self.assertTrue(len(env.print_statements) == len(exp), f'len(env.print_statements) -> {i} = {len(env.print_statements)} != {len(exp)}')
+            for j, s in enumerate(exp):
+                self.assertTrue(env.print_statements[j] == s, f'env.print_statements[{j}] -> {i} = {env.print_statements[j]} != {s}')
+
 
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)
         p = Parser(l)
 
         program = p.parse_program()
-        return eval(program, Environment())
+        return eval(program, Environment(print_statements=[]))
     
 
 if __name__ == '__main__':

@@ -161,6 +161,13 @@ class Builtin:
     def inspect(self):
         return f"Builtin function : {self.name}"
 
+class BuiltinKeywordFunction:
+    def __init__(self, name):
+        self.name = name
+    
+    def inspect(self):
+        return f"Builtin Keyword Function: {self.name}"
+
 def null_function(*args):
     return NullObj()
 

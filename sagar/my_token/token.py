@@ -47,6 +47,7 @@ class Constants:
     IF = "IF"
     ELSE = "ELSE"
     STRING = 'STRING'
+    WHILE = 'WHILE'
 
 two_char_ops = {
     '==': Constants.EQ,
@@ -60,7 +61,8 @@ keywords = {
     'false': Constants.FALSE,
     'if': Constants.IF,
     'else': Constants.ELSE,
-    "return": Constants.RETURN
+    "return": Constants.RETURN,
+    "while": Constants.WHILE
 }
 
 def get_two_char_type(ch: str) -> TokenType:

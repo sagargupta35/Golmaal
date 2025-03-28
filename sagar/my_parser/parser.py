@@ -93,6 +93,8 @@ class Parser:
             case Constants.RETURN:
                 rt_stmt = self.parse_return_statement()
                 return rt_stmt
+            case Constants.WHILE:
+                return self.parse_while_statement()
             case _:
                 exp_stmt = self.parse_expression_statement()
                 return exp_stmt
@@ -241,7 +243,7 @@ class Parser:
 
     def parse_block_statement(self) -> BlockStatement:
         block_stmt = BlockStatement(token=self.cur_token)
-        self.next_token() # token is at {
+        self.next_token()
         
         while self.cur_token.token_type != Constants.RBRACE and self.cur_token.token_type != Constants.EOF:
             stmt = self.parse_statement()
@@ -368,7 +370,29 @@ class Parser:
 
         return ass_stm
 
-    
+    def parse_while_statement(self) -> WhileStatement:
+        stmt = WhileStatement(self.cur_token, condition = None, body=None)
+        #token is at While
+        self.next_token()
+        #token is at (
+        self.next_token()
+
+        condition = self.parse_expression(LOWEST)
+        
+        if not self.expect_peek(Constants.RPAREN):
+            return None
+        
+        if not self.expect_peek(Constants.LBRACE):
+            return None
+        blk_stmt = self.parse_block_statement()
+
+        if self.peek_token.token_type == Constants.SEMICOLON:
+            self.next_token()
+        
+        stmt.condition = condition
+        stmt.body = blk_stmt
+
+        return stmt
 
 
     

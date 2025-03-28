@@ -19,7 +19,7 @@ def __length(args: list[Object], **kwargs) -> Object:
         return IntegerObj(len(arg.elements))
     return ErrorObj(f"argument to 'len' not supported, got {arg.get_type()}")
 
-def __print(args: list[Object], **kwargs) -> NullObj:
+def __print(args: list[Object], **kwargs) -> NullObj | ErrorObj:
     env = kwargs['env']
     if not env:
         return ErrorObj('no environment found to print')
@@ -28,11 +28,12 @@ def __print(args: list[Object], **kwargs) -> NullObj:
     for obj in args:
         env.print(obj)
     return NullObj()
-    
 
 builtins = {
     'len': Builtin(__length, name = 'len'),
-    'print': Builtin(__print, name = 'print')
+    'print': Builtin(__print, name = 'print'),
+    'break': BuiltinKeywordFunction(name='break'),
+    'continue': BuiltinKeywordFunction(name = 'continue')
 }
 
 
@@ -101,10 +102,7 @@ def eval(node: Node, env: Environment) -> Object:
         fun = eval(node.function, env)
         if is_error(fun):
             return fun
-        args = eval_arguments(node.arguments, env)
-        if len(args) == 1 and is_error(args[0]):
-            return args[0]
-        return apply_fun(fun, args, env)
+        return apply_fun(fun, node.arguments, env)
     
     elif isinstance(node, StringExpression):
         str_obj = StringObj(node.value)
@@ -124,11 +122,19 @@ def eval(node: Node, env: Environment) -> Object:
         ass_obj = AssignmentObj(node.left, right)
         evaluated = eval_assignment(ass_obj, env)
         return evaluated
+
+    elif isinstance(node, WhileStatement):
+        return eval_while_statement(node, env)
           
     return ErrorObj('cannot evaluate the statement')
 
 
-def apply_fun(fun: Object, args: list[Object], env: Environment) -> Object:
+def apply_fun(fun: Object, raw_args: list[Expression], env: Environment) -> Object:
+    args = eval_arguments(raw_args, env)
+
+    if len(args) == 1 and is_error(args[0]):
+        return args[0]
+
     if isinstance(fun, FunctionObj):
         extended_env = get_extended_env(fun, args)
         if is_error(extended_env):
@@ -138,7 +144,7 @@ def apply_fun(fun: Object, args: list[Object], env: Environment) -> Object:
     
     elif isinstance(fun, Builtin):
         return fun.fn(args, env = env)
-    
+     
     return ErrorObj(f'not a function: {str(fun)}')
     
 
@@ -286,7 +292,7 @@ def eval_if_expression(exp: IfExpression, env: Environment):
     if is_error(condition):
         return condition
 
-    truthy = is_truthy(condition)
+    truthy = get_truthy(condition)
     if is_error(truthy):
         return truthy
 
@@ -298,7 +304,41 @@ def eval_if_expression(exp: IfExpression, env: Environment):
     return EvalConstants.NULL_OBJ
 
 
-def is_truthy(obj: Object):
+def eval_while_statement(whl_stmt: WhileStatement, env: Environment) -> NullObj | ErrorObj:
+    condition = eval(whl_stmt.condition, env)
+
+    if is_error(condition):
+        return condition
+
+    truthy = get_truthy(condition)
+    if is_error(truthy):
+        return truthy
+
+    while truthy.value:
+        res = EvalConstants.NULL_OBJ
+        for stmt in whl_stmt.body.statements:
+            res = eval(stmt, env)
+            if is_error(res):
+                return res
+            if isinstance(res, ReturnObj):
+                return ErrorObj('cannot have a return statement inside a while function')
+            if isinstance(res, BuiltinKeywordFunction):
+                break
+        
+        if isinstance(res, BuiltinKeywordFunction) and res.name == 'break':
+            break
+        
+        condition = eval(whl_stmt.condition, env)
+        if is_error(condition):
+            return condition
+        truthy = get_truthy(condition)
+        if is_error(truthy):
+            return truthy
+        
+    return EvalConstants.NULL_OBJ
+
+
+def get_truthy(obj: Object) -> BooleanObj | ErrorObj:
     if isinstance(obj, NullObj):
         return EvalConstants.FALSE_BOOLEAN_OBJ
     if isinstance(obj, BooleanObj):
