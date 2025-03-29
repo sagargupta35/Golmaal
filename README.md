@@ -19,7 +19,7 @@
 3. `len([1, 2, 3]) // 3` 
 
 ## if-else:
->truthy values can be extracted from integers and booleans:
+>truthy values can be extracted from integers and booleans: <br>
 	>> all positive numbers and true yield true <br>
 	>> all non-positive numbers and false yield false
 	
