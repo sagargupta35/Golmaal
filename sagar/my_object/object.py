@@ -109,11 +109,13 @@ class Environment:
         self.store[name] = val
         return val
     
-    def print(self, obj):
+    def print(self, obj) -> bool:
         if self.print_statements is not None:
             self.print_statements.append(obj.inspect())
+            if len(self.print_statements) == 1000:
+                return True
         else:
-            self.outer.print(obj)
+            return self.outer.print(obj)
     
 class FunctionObj(Object):
     def __init__(self, params: list[Identifier], body: BlockStatement, env: Environment):

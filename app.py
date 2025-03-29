@@ -24,17 +24,17 @@ def receive_data():
     program = p.parse_program()
 
     if len(p.errors):
-        return jsonify({'Parse Error':p.errors})
+        return jsonify({'Error':p.errors})
     
     try:
         evaluated = eval(program, env)
         if is_error(evaluated):
-            return jsonify({'Error': evaluated.message})
+            return jsonify({'Error': evaluated.message, 'Output': env.print_statements})
         return jsonify({
-            'Output': '\n'.join(env.print_statements)
+            'Output': env.print_statements
         })
     except Exception as e:
-        return jsonify({'Cannot evaluated code:': e})
+        return jsonify({'Cannot evaluated code (probably an internal error)': e})
 
 
 if __name__ == '__main__':

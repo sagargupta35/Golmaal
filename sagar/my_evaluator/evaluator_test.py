@@ -125,6 +125,7 @@ class TestEvaluator(unittest.TestCase):
             }''', 'unknown operator: BOOLEAN + BOOLEAN'),
             ('foobar', 'identifier not found: foobar'),
             ('print(a)', 'identifier not found: a'),
+            ('while(true){print(3)}', 'Cannot print more than 1000 statements currently.')
             
         ]
 
@@ -302,7 +303,50 @@ class TestEvaluator(unittest.TestCase):
             for j, s in enumerate(exp):
                 self.assertTrue(env.print_statements[j] == s, f'env.print_statements[{j}] -> {i} = {env.print_statements[j]} != {s}')
 
+    def test_index_expression(self):
+        tests = [
+            'let x = 10; while(x > 0){x = x-1;}; let arr = [1, 2, 3]; print(arr[x])',
+            'let arr = [1, 2, 3, 4, 5]; print(arr[0])',
+            'let arr = [1, 2, 3, 4, 5]; print(arr[4])',
+            'let arr = [1, 2, 3, 4, 5]; print(arr[2])',
+            'let arr = [1, 2, 3]; let idx = 1; print(arr[idx])',
+            'let arr = [1, 2, 3]; let idx = 2; print(arr[idx])',
+            'let arr = [1, 2, 3]; print(arr[3])',  # Out of bounds
+            'let arr = [1, 2, 3]; print(arr[-1])',  # Negative index
+            'let arr = [1, 2, 3]; let idx = "1"; print(arr[idx])',  # Invalid index type
+            'let arr = []; print(arr[0])',  # Empty array
+            'let x = 10; print(x[3])' # Invalid array type
+        ]
+        exp = [
+            ['1'],
+            ['1'],
+            ['5'],
+            ['3'],
+            ['2'],
+            ['3'],
+            ['Array index out of bounds for length 3: 3'],
+            ['Array index out of bounds for length 3: -1'],
+            ['cannot index an array with non-integer types: STRING'],
+            ['Array index out of bounds for length 0: 0'],
+            ['INTEGER cannot be subscripted']
+        ]
+        for i, test in enumerate(tests):
+            evaluated, env = self.get_eval_env(test)
+            if isinstance(evaluated, ErrorObj):
+                self.assertTrue(evaluated.message == exp[i][0], f'evaluated.message -> {i} = {evaluated.message} != {exp[i][0]}')
+            else:
+                self.assertTrue(env.print_statements == exp[i], f'env.print_statements -> {i} = {env.print_statements} != {exp[i]}')
 
+
+    def get_eval_env(self, inp: str):
+        l = new_lexer(inp)
+        p = Parser(l)
+        program = p.parse_program()
+
+        env = Environment(print_statements=[])
+        evaluated = eval(program, env)
+        return evaluated, env
+    
     def get_eval(self, inp: str) -> Object:
         l = new_lexer(inp)
         p = Parser(l)

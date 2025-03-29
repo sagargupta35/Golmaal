@@ -25,8 +25,13 @@ def __print(args: list[Object], **kwargs) -> NullObj | ErrorObj:
         return ErrorObj('no environment found to print')
     if not isinstance(env, Environment):
         return ErrorObj('no environment found to print')
+    overload = False
     for obj in args:
-        env.print(obj)
+        overload = env.print(obj)
+        if overload:
+            break
+    if overload:
+        return ErrorObj('Cannot print more than 1000 statements currently.')
     return NullObj()
 
 builtins = {
@@ -38,7 +43,6 @@ builtins = {
 
 
 def eval(node: Node, env: Environment) -> Object:
-    
     if isinstance(node, Program):
         return eval_statements(node.statements, env)
     
@@ -125,6 +129,9 @@ def eval(node: Node, env: Environment) -> Object:
 
     elif isinstance(node, WhileStatement):
         return eval_while_statement(node, env)
+
+    elif isinstance(node, IndexExpression):
+        return eval_index_operation(node, env)
           
     return ErrorObj('cannot evaluate the statement')
 
@@ -367,8 +374,24 @@ def eval_assignment(obj: AssignmentObj, env: Environment):
             return ErrorObj(f'identifier not declared: {iden.value}')
         env.put(iden.value, obj.right)
         return EvalConstants.NULL_OBJ
-    
+
     return ErrorObj(f'cannot assign value to {obj.inspect()}')
+
+def eval_index_operation(ie: IndexExpression, env: Environment):
+    arr = eval(ie.left, env)
+    if is_error(arr):
+        return arr
+    if not isinstance(arr, ArrayObj):
+        return ErrorObj(f'{arr.get_type()} cannot be subscripted')
+    index: Object = eval(ie.index, env)
+    if is_error(index):
+        return index
+    if not isinstance(index, IntegerObj):
+        return ErrorObj(f'cannot index an array with non-integer types: {index.get_type()}')
+    elements = arr.elements
+    if index.value < 0 or index.value >= len(elements):
+        return ErrorObj(f'Array index out of bounds for length {len(elements)}: {index.value}')
+    return elements[index.value]
 
 def is_error(err: Object) -> bool:
     return err and isinstance(err, ErrorObj)
