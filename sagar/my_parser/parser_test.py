@@ -9,9 +9,9 @@ class TestParser(unittest.TestCase):
     
     def test_let_statement(self):
         inp = '''
-            let five = 5;
-            let t = true;
-            let foobar = y;
+            jaadu five = 5;
+            jaadu t = true;
+            jaadu foobar = y;
         '''
 
         l = new_lexer(inp)
@@ -29,7 +29,7 @@ class TestParser(unittest.TestCase):
             self.validate_let_statement(stmt, iden, exp)
 
     def validate_let_statement(self, stmt: Statement, iden: str, expected):
-        self.assertTrue(stmt.token_literal() == 'let', f"Expected let as token literal for stmt. But found {stmt.token_literal()}")
+        self.assertTrue(stmt.token_literal() == 'jaadu', f"Expected jaadu as token literal for stmt. But found {stmt.token_literal()}")
         self.assertTrue(isinstance(stmt, LetStatement), f"stmt is not instance of LetStatement. It is a {type(stmt)}")
         letstmt: LetStatement = stmt
         self.assertTrue(letstmt.name.token_literal() == iden, f"letstmt.name.token_literal() is not {iden}. Found {letstmt.name.token_literal()}")
@@ -39,9 +39,9 @@ class TestParser(unittest.TestCase):
 
     def test_return_statement(self):
         inp = '''
-            return 10;
-            return 5;
-            return 342934923;
+            ye_lo 10;
+            ye_lo 5;
+            ye_lo 342934923;
         '''
 
         l = new_lexer(inp)
@@ -54,7 +54,7 @@ class TestParser(unittest.TestCase):
         self.assertTrue(len(program.statements) == 3, f"Expected 3 statements. But found {len(program.statements)} statements")
         
         for i, stmt in enumerate(program.statements):
-            self.assertTrue(stmt.token_literal() == 'return', f"Expected return as token_literal. But found {stmt.token_literal()}")
+            self.assertTrue(stmt.token_literal() == 'ye_lo', f"Expected return as token_literal. But found {stmt.token_literal()}")
             self.assertTrue(isinstance(stmt, ReturnStatement), f"stmt {i} is not an instance of ReturnStatment")
 
 
@@ -297,7 +297,7 @@ class TestParser(unittest.TestCase):
 
 
     def test_function_literal(self):
-        inp = 'fn(x, y){x + y;}'
+        inp = 'golmaal(x, y){x + y;}'
         l = new_lexer(inp)
         p = Parser(l)
 
@@ -326,7 +326,7 @@ class TestParser(unittest.TestCase):
         self.validate_infix_expression(body_exp_stmt.expression, 'x', '+', 'y')
 
     def test_function_params(self):
-        inps = [('fn(){}', []), ('fn(x,){x}', ['x']), ('fn(x, y, z,){x+y+z;}', ['x', 'y', 'z'])]
+        inps = [('golmaal(){}', []), ('golmaal(x,){x}', ['x']), ('golmaal(x, y, z,){x+y+z;}', ['x', 'y', 'z'])]
         for i, (inp, expected) in enumerate(inps):
             l = new_lexer(inp)
             p = Parser(l)
@@ -351,8 +351,8 @@ class TestParser(unittest.TestCase):
 
 
     def test_call_expression(self):
-        # add() add(foobar) add(2, fn(x, y){x+y}(2, 3)) add(2, 3*5, 4+8)
-        inps = ['add()', 'add(foobar)', 'add(2, fn(x, y){x+y}(2, 3))', 'add(2, 3*5, 4+8)']
+        # add() add(foobar) add(2, golmaal(x, y){x+y}(2, 3)) add(2, 3*5, 4+8)
+        inps = ['add()', 'add(foobar)', 'add(2, golmaal(x, y){x+y}(2, 3))', 'add(2, 3*5, 4+8)']
         for i, inp in enumerate(inps):
             l = new_lexer(inp)
             p = Parser(l)
@@ -416,7 +416,7 @@ class TestParser(unittest.TestCase):
     def test_array_literals(self):
         inps = [
             '[]',
-            '[1, 1*2, fn(x, y){x+y}, false]'
+            '[1, 1*2, golmaal(x, y){x+y}, false]'
         ]
 
         for i, inp in enumerate(inps):
@@ -472,8 +472,8 @@ class TestParser(unittest.TestCase):
             'y = true;',
             'z = "hello";',
             'arr = [1, 2, 3];',
-            'x = fn(a, b) { a + b; };',
-            'nested = fn(x) { x = x + 1; };'
+            'x = golmaal(a, b) { a + b; };',
+            'nested = golmaal(x) { x = x + 1; };'
         ]
 
         for i, inp in enumerate(inps):
@@ -535,11 +535,11 @@ class TestParser(unittest.TestCase):
 
     def test_while_stmt(self):
         inps = [
-            'let x = 10; while(x){x = x-1;}',
-            'let y = 5; while(y > 0){y = y - 1;}',
-            'let z = 0; while(z < 3){z = z + 1;}',
-            'let a = true; while(a){a = false;}',
-            'let b = 0; while(b < 10){if(b == 5){b = b + 2;} else {b = b + 1;}}'
+            'jaadu x = 10; while(x){x = x-1;}',
+            'jaadu y = 5; while(y > 0){y = y - 1;}',
+            'jaadu z = 0; while(z < 3){z = z + 1;}',
+            'jaadu a = true; while(a){a = false;}',
+            'jaadu b = 0; while(b < 10){if(b == 5){b = b + 2;} else {b = b + 1;}}'
         ]
 
         for i, test in enumerate(inps):

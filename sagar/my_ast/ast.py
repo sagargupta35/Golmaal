@@ -55,7 +55,7 @@ class LetStatement(Statement):
 
     def __str__(self) -> str:
         res: list[str] = []
-        res.append('let')
+        res.append('jaadu')
         res.append(str(self.name))
         res.append('=')
         if self.value:
@@ -75,7 +75,7 @@ class ReturnStatement(Statement):
 
     def __str__(self) -> str:
         res = []
-        res.append('return')
+        res.append('ye_lo')
         if self.value:
             res.append(str(self.value))
         return ' '.join(res)

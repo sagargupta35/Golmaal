@@ -89,16 +89,16 @@ class TestEvaluator(unittest.TestCase):
 
     def test_return_statements(self):
         inps = [
-            ("return 10;", 10),
-            ("return 10; 9;", 10),
-            ("return 2 * 5; 9;", 10),
-            ("9; return 2 * 5; 9;", 10),
+            ("ye_lo 10;", 10),
+            ("ye_lo 10; 9;", 10),
+            ("ye_lo 2 * 5; 9;", 10),
+            ("9; ye_lo 2 * 5; 9;", 10),
             ('''
                 if(10 > 1){
                     if(10 > 1){
-                        return 10;
+                        ye_lo 10;
                     }
-                    return 1;
+                    ye_lo 1;
                 }
             ''', 10)
         ]
@@ -119,9 +119,9 @@ class TestEvaluator(unittest.TestCase):
             ('''
             if (10 > 1) {
                 if (10 > 1) {
-                    return true + false;
+                    ye_lo true + false;
                 }
-                return 1;
+                ye_lo 1;
             }''', 'unknown operator: BOOLEAN + BOOLEAN'),
             ('foobar', 'identifier not found: foobar'),
             ('print(a)', 'identifier not found: a'),
@@ -138,9 +138,9 @@ class TestEvaluator(unittest.TestCase):
 
     def test_let_statemtnts(self):
         inps = [
-            ('let a = 5; a;', 5),
-            ('let a = 10; let b = 5; a+b;', 15),
-            ('let a = 5; let b = 6; let c = a + b; c-10;', 1)
+            ('jaadu a = 5; a;', 5),
+            ('jaadu a = 10; jaadu b = 5; a+b;', 15),
+            ('jaadu a = 5; jaadu b = 6; jaadu c = a + b; c-10;', 1)
         ]
 
         for i, (inp, exp) in enumerate(inps):
@@ -148,7 +148,7 @@ class TestEvaluator(unittest.TestCase):
             self.validate_integer_obj(evaluated, value=exp, idx=i)
 
     def test_function_object(self):
-        inp = 'fn(x){return x+5;};'
+        inp = 'golmaal(x){ye_lo x+5;};'
 
         evaluated = self.get_eval(inp)
         self.assertTrue(isinstance(evaluated, FunctionObj), f'evaluated is not a FunctionObj. Its a {type(evaluated)}')
@@ -157,18 +157,18 @@ class TestEvaluator(unittest.TestCase):
         self.assertTrue(len(fun.params) == 1, f'len(fun.params) = {len(fun.params)} != 1')
         self.assertTrue(str(fun.params[0]) == 'x', f'str(fun.params[0]) = {str(fun.params[0])} != "x"')
         
-        body_str_exp = 'return (x + 5)'
+        body_str_exp = 'ye_lo (x + 5)'
         self.assertTrue(str(fun.body) == body_str_exp, f'str(fun.body) = {str(fun.body)} != {body_str_exp}')
 
 
     def test_call_expression(self):
         inps = [
-            ("let identity = fn(x) { x; }; identity(5);", 5),
-            ("let identity = fn(x) { return x; }; identity(5);", 5),
-            ("let double = fn(x) { x * 2; }; double(5);", 10),
-            ("let add = fn(x, y) { x + y; }; add(5, 5);", 10),
-            ("let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20),
-            ("fn(x) { x; }(5)", 5)
+            ("jaadu identity = golmaal(x) { x; }; identity(5);", 5),
+            ("jaadu identity = golmaal(x) { ye_lo x; }; identity(5);", 5),
+            ("jaadu double = golmaal(x) { x * 2; }; double(5);", 10),
+            ("jaadu add = golmaal(x, y) { x + y; }; add(5, 5);", 10),
+            ("jaadu add = golmaal(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20),
+            ("golmaal(x) { x; }(5)", 5)
         ]
         for i, (inp, exp) in enumerate(inps):
             evaluated = self.get_eval(inp)
@@ -218,22 +218,22 @@ class TestEvaluator(unittest.TestCase):
 
     def test_assignment_statement(self):
         inps = [
-            ('let x = 10; x = 5; x;', 5),
-            ('let x = 10; x = x + 5; x;', 15),
-            ('let x = 10; let y = 20; x = y; x;', 20),
-            ('let x = 10; let y = 20; x = y + 10; x;', 30),
-            ('let x = 10; x = x * 2; x;', 20),
-            ('let x = 10; if (x > 5) { x = 15; }; x;', 15),
-            ('let x = 10; if (x < 5) { x = 15; } else { x = 20; }; x;', 20),
-            ('let x = 10; let y = 5; if (x > y) { x = x + y; }; x;', 15),
-            ('let x = 10; x = x - 5; x;', 5),
-            ('let x = 10; x = x / 2; x;', 5),
-            ('let x = 10; x = x + 5 * 2; x;', 20),
-            ('let x = 10; x = x + (5 * 2); x;', 20),
-            ('let x = 10; x = x + (5 * 2) - 5; x;', 15),
-            ('let x = 10; let y = 5; x = x + y * 2; x;', 20),
-            ('let x = 10; let y = 5; x = x + (y * 2); x;', 20),
-            ('let x = 10; let y = 5; x = x + (y * 2) - y; x;', 15),
+            ('jaadu x = 10; x = 5; x;', 5),
+            ('jaadu x = 10; x = x + 5; x;', 15),
+            ('jaadu x = 10; jaadu y = 20; x = y; x;', 20),
+            ('jaadu x = 10; jaadu y = 20; x = y + 10; x;', 30),
+            ('jaadu x = 10; x = x * 2; x;', 20),
+            ('jaadu x = 10; if (x > 5) { x = 15; }; x;', 15),
+            ('jaadu x = 10; if (x < 5) { x = 15; } else { x = 20; }; x;', 20),
+            ('jaadu x = 10; jaadu y = 5; if (x > y) { x = x + y; }; x;', 15),
+            ('jaadu x = 10; x = x - 5; x;', 5),
+            ('jaadu x = 10; x = x / 2; x;', 5),
+            ('jaadu x = 10; x = x + 5 * 2; x;', 20),
+            ('jaadu x = 10; x = x + (5 * 2); x;', 20),
+            ('jaadu x = 10; x = x + (5 * 2) - 5; x;', 15),
+            ('jaadu x = 10; jaadu y = 5; x = x + y * 2; x;', 20),
+            ('jaadu x = 10; jaadu y = 5; x = x + (y * 2); x;', 20),
+            ('jaadu x = 10; jaadu y = 5; x = x + (y * 2) - y; x;', 15),
         ]
 
         for i, (inp, exp) in enumerate(inps):
@@ -242,20 +242,20 @@ class TestEvaluator(unittest.TestCase):
 
     def test_print_statements(self):
         tests = [
-            ('let a = 10; print(a);', ['10']),
-            ('let a = 10; let b = 20; print(a, b);', ['10', '20']),
-            ('let a = 10; let b = 20; let c = a + b; print(c);', ['30']),
+            ('jaadu a = 10; print(a);', ['10']),
+            ('jaadu a = 10; jaadu b = 20; print(a, b);', ['10', '20']),
+            ('jaadu a = 10; jaadu b = 20; jaadu c = a + b; print(c);', ['30']),
             ('print("Hello, World!");', ['Hello, World!']),
-            ('let a = "Hello"; let b = "World"; print(a + " " + b);', ['Hello World']),
-            ('let a = [1, 2, 3]; print(a);', ['[1, 2, 3]']),
-            ('let a = fn(x) { x * 2; }; print(a(5));', ['10']),
+            ('jaadu a = "Hello"; jaadu b = "World"; print(a + " " + b);', ['Hello World']),
+            ('jaadu a = [1, 2, 3]; print(a);', ['[1, 2, 3]']),
+            ('jaadu a = golmaal(x) { x * 2; }; print(a(5));', ['10']),
             ('if (true) { print("Condition is true"); }', ['Condition is true']),
             ('if (false) { print("Condition is false"); } else { print("Condition is true"); }', ['Condition is true']),
-            ('let a = 10; if (a > 5) { print("a is greater than 5"); }', ['a is greater than 5']),
-            ('let a = 10; let b = 20; if (a < b) { print("a is less than b"); } else { print("a is not less than b"); }', ['a is less than b']),
-            ('let a = 10; let b = 20; print(a, b, a + b);', ['10', '20', '30']),
-            ('let a = 10; let b = 20; let c = a * b; print(a, b, c);', ['10', '20', '200']),
-            ('let a = 10; let b = 20; let c = a * b; print(a, b, c, c / a);', ['10', '20', '200', '20']),
+            ('jaadu a = 10; if (a > 5) { print("a is greater than 5"); }', ['a is greater than 5']),
+            ('jaadu a = 10; jaadu b = 20; if (a < b) { print("a is less than b"); } else { print("a is not less than b"); }', ['a is less than b']),
+            ('jaadu a = 10; jaadu b = 20; print(a, b, a + b);', ['10', '20', '30']),
+            ('jaadu a = 10; jaadu b = 20; jaadu c = a * b; print(a, b, c);', ['10', '20', '200']),
+            ('jaadu a = 10; jaadu b = 20; jaadu c = a * b; print(a, b, c, c / a);', ['10', '20', '200', '20']),
         ]
 
         for i, (test, exp) in enumerate(tests):
@@ -270,13 +270,13 @@ class TestEvaluator(unittest.TestCase):
 
     def test_while_statement(self):
         tests = [
-            'let x = 10; while(x){x = x-1;}; print(x);',
-            'let x = 5; let y = 0; while(x){y = y + x; x = x - 1;}; print(y);',
-            'let x = 0; while(x < 5){x = x + 1;}; print(x);',
-            'let x = 10; let y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, y);',
-            'let x = 3; let y = 1; while(x > 0){y = y * x; x = x - 1;}; print(y);',
-            'let x = 10; while(x > 0){if(x == 5){break;}; x = x - 1;}; print(x);',
-            'let x = 10; let y = 0; while(x > 0){if(x == 5){x = x - 1; continue;}; y = y + x; x = x - 1;}; print(y);',
+            'jaadu x = 10; while(x){x = x-1;}; print(x);',
+            'jaadu x = 5; jaadu y = 0; while(x){y = y + x; x = x - 1;}; print(y);',
+            'jaadu x = 0; while(x < 5){x = x + 1;}; print(x);',
+            'jaadu x = 10; jaadu y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, y);',
+            'jaadu x = 3; jaadu y = 1; while(x > 0){y = y * x; x = x - 1;}; print(y);',
+            'jaadu x = 10; while(x > 0){if(x == 5){break;}; x = x - 1;}; print(x);',
+            'jaadu x = 10; jaadu y = 0; while(x > 0){if(x == 5){x = x - 1; continue;}; y = y + x; x = x - 1;}; print(y);',
         ]
         expected_outputs = [
             ['0'],
@@ -305,17 +305,17 @@ class TestEvaluator(unittest.TestCase):
 
     def test_index_expression(self):
         tests = [
-            'let x = 10; while(x > 0){x = x-1;}; let arr = [1, 2, 3]; print(arr[x])',
-            'let arr = [1, 2, 3, 4, 5]; print(arr[0])',
-            'let arr = [1, 2, 3, 4, 5]; print(arr[4])',
-            'let arr = [1, 2, 3, 4, 5]; print(arr[2])',
-            'let arr = [1, 2, 3]; let idx = 1; print(arr[idx])',
-            'let arr = [1, 2, 3]; let idx = 2; print(arr[idx])',
-            'let arr = [1, 2, 3]; print(arr[3])',  # Out of bounds
-            'let arr = [1, 2, 3]; print(arr[-1])',  # Negative index
-            'let arr = [1, 2, 3]; let idx = "1"; print(arr[idx])',  # Invalid index type
-            'let arr = []; print(arr[0])',  # Empty array
-            'let x = 10; print(x[3])' # Invalid array type
+            'jaadu x = 10; while(x > 0){x = x-1;}; jaadu arr = [1, 2, 3]; print(arr[x])',
+            'jaadu arr = [1, 2, 3, 4, 5]; print(arr[0])',
+            'jaadu arr = [1, 2, 3, 4, 5]; print(arr[4])',
+            'jaadu arr = [1, 2, 3, 4, 5]; print(arr[2])',
+            'jaadu arr = [1, 2, 3]; jaadu idx = 1; print(arr[idx])',
+            'jaadu arr = [1, 2, 3]; jaadu idx = 2; print(arr[idx])',
+            'jaadu arr = [1, 2, 3]; print(arr[3])',  # Out of bounds
+            'jaadu arr = [1, 2, 3]; print(arr[-1])',  # Negative index
+            'jaadu arr = [1, 2, 3]; jaadu idx = "1"; print(arr[idx])',  # Invalid index type
+            'jaadu arr = []; print(arr[0])',  # Empty array
+            'jaadu x = 10; print(x[3])' # Invalid array type
         ]
         exp = [
             ['1'],

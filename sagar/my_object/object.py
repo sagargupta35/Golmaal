@@ -23,7 +23,7 @@ class ObjConstants:
     NULL_OBJ = 'NULL'
     RETURN_VALUE_OBJ = 'RETURN_VALUE'
     ERROR_OBJ = 'ERROR'
-    FUNCTION_OBJ = 'FUNCTION'
+    FUNCTION_OBJ = 'GOLMAAL'
     STRING_OBJ = 'STRING'
     ARRAY_OBJ = 'ARRAY'
     ASSIGN_OBJ = 'ASSIGMENT'
@@ -128,7 +128,7 @@ class FunctionObj(Object):
     
     def inspect(self):
         res = [
-            'fn',
+            'golmaal',
             '(',
             ', '.join(list(map(str, self.params))),
             ')',

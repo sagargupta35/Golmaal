@@ -6,18 +6,18 @@ class TestNextToken(unittest.TestCase):
 
     def test_next_token(self):
         input = '''
-            let five = 5;
-            let ten = 10;
-            let add = fn(x, y) {
+            jaadu five = 5;
+            jaadu ten = 10;
+            jaadu add = golmaal(x, y) {
             x + y;
             };
-            let result = add(five, ten);
+            jaadu result = add(five, ten);
             !-/*5;
             5 < 10 > 5;
             if (5 < 10) {
-            return true;
+            ye_lo true;
             } else {
-            return false;
+            ye_lo false;
             }
             10 == 10;
             10 != 9;
@@ -28,22 +28,22 @@ class TestNextToken(unittest.TestCase):
         con = Constants()
 
         tokens = [
-            (con.LET, "let"),
+            (con.LET, "jaadu"),
             (con.IDENT, "five"),
             (con.ASSIGN, "="),
             (con.INT, "5"),
             (con.SEMICOLON, ";"),
 
-            (con.LET, "let"),
+            (con.LET, "jaadu"),
             (con.IDENT, "ten"),
             (con.ASSIGN, "="),
             (con.INT, "10"),
             (con.SEMICOLON, ";"),
 
-            (con.LET, "let"),
+            (con.LET, "jaadu"),
             (con.IDENT, "add"),
             (con.ASSIGN, "="),
-            (con.FUNCTION, "fn"),
+            (con.FUNCTION, "golmaal"),
             (con.LPAREN, "("),
             (con.IDENT, "x"),
             (con.COMMA, ","),
@@ -59,7 +59,7 @@ class TestNextToken(unittest.TestCase):
             (con.RBRACE, "}"),
             (con.SEMICOLON, ";"),
 
-            (con.LET, "let"),
+            (con.LET, "jaadu"),
             (con.IDENT, "result"),
             (con.ASSIGN, "="),
             (con.IDENT, "add"),
@@ -92,7 +92,7 @@ class TestNextToken(unittest.TestCase):
             (con.RPAREN, ")"),
             (con.LBRACE, "{"),
 
-            (con.RETURN, "return"),
+            (con.RETURN, "ye_lo"),
             (con.TRUE, "true"),
             (con.SEMICOLON, ";"),
 
@@ -100,7 +100,7 @@ class TestNextToken(unittest.TestCase):
             (con.ELSE, "else"),
             (con.LBRACE, "{"),
 
-            (con.RETURN, "return"),
+            (con.RETURN, "ye_lo"),
             (con.FALSE, "false"),
             (con.SEMICOLON, ";"),
 

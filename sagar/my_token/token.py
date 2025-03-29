@@ -39,9 +39,9 @@ class Constants:
     RBRACKET = ']'
 
     # Keywords
-    FUNCTION = "FUNCTION"
-    LET = "LET"
-    RETURN = "RETURN"
+    FUNCTION = "GOLMAAL"
+    LET = "JAADU"
+    RETURN = "YE_LO"
     TRUE = "TRUE"
     FALSE = "FALSE"
     IF = "IF"
@@ -55,13 +55,13 @@ two_char_ops = {
 }
 
 keywords = {
-    'let': Constants.LET,
-    'fn': Constants.FUNCTION,
+    'jaadu': Constants.LET,
+    'golmaal': Constants.FUNCTION,
     'true': Constants.TRUE,
     'false': Constants.FALSE,
     'if': Constants.IF,
     'else': Constants.ELSE,
-    "return": Constants.RETURN,
+    "ye_lo": Constants.RETURN,
     "while": Constants.WHILE
 }
 
