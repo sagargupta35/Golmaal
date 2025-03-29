@@ -4,7 +4,7 @@ from sagar.lexer.Lexer import new_lexer
 from sagar.my_parser.parser import Parser
 from sagar.my_evaluator.evaluator import eval, is_error
 from waitress import serve
-
+from flask_cors import CORS
 
 app = Flask(__name__)
 
@@ -36,6 +36,7 @@ def receive_data():
     except Exception as e:
         return jsonify({'Cannot evaluated code (probably an internal error)': e})
 
+CORS(app)
 
 if __name__ == '__main__':
     serve(app, host="0.0.0.0", port=8080)
