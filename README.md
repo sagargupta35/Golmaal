@@ -7,11 +7,11 @@
 4. **Arrays**: `[1, false, "golmaal"] // arrays are immutable`
 
 ## Variable Declaration
-`let a = 10;`
+`jaadu a = 10;`
 
 `a = false;` **(re-assignment is allowed only if you have already declared the variable)**
 
-`let b = [1, false, fn(a){return a*2}]`
+`jaadu b = [1, false, golmaal(a){ye_lo a*2}]`
 
 ##  Built-in functions
 1. `print(2, 3, false)` multiple arguements are printed line by line
@@ -33,7 +33,7 @@ if(3){
 
 ## loop:
 ```
-let a = 10;
+jaadu a = 10;
 while(a){
 	print("a");
 	a = a-1;
@@ -43,20 +43,20 @@ while(a){
 ## Functions:
 #### Functions are also expressions in Golmaal.
 ```
-let a = fn(a, b){
-	return a + b*2;
+jaadu a = golmaal(a, b){
+	ye_lo a + b*2;
 }
 ```
-note that return keyword is optional
+note that ye_lo keyword is optional
 <br>
 <br>
 
 ## Closures:
 ```
-let a = fn(a, b){
-	return a + b*2;
+jaadu a = golmaal(a, b){
+	ye_lo a + b*2;
 }
-let b = fn(a, b){
+jaadu b = golmaal(a, b){
 	a = a+1;
 	a*b(a, 2);
 }
