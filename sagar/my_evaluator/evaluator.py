@@ -321,7 +321,11 @@ def eval_while_statement(whl_stmt: WhileStatement, env: Environment) -> NullObj 
     if is_error(truthy):
         return truthy
 
+    iter_left = 1000
+
     while truthy.value:
+        if iter_left == 0:
+            return ErrorObj('Can only perform 1000 iterations currently')
         res = EvalConstants.NULL_OBJ
         for stmt in whl_stmt.body.statements:
             res = eval(stmt, env)
@@ -341,7 +345,7 @@ def eval_while_statement(whl_stmt: WhileStatement, env: Environment) -> NullObj 
         truthy = get_truthy(condition)
         if is_error(truthy):
             return truthy
-        
+        iter_left = iter_left-1
     return EvalConstants.NULL_OBJ
 
 

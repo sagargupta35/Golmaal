@@ -4,7 +4,7 @@
 1. **Integers**: `10, 20, -10`
 2. **Booleans** `true, false`
 3. **Strings**: `"golmaal", "is fun"`
-4. **Arrays**: `[1, false, "golmaal"]`
+4. **Arrays**: `[1, false, "golmaal"] // arrays are immutable`
 
 ## Variable Declaration
 `let a = 10;`
