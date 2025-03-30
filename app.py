@@ -5,8 +5,12 @@ from sagar.my_parser.parser import Parser
 from sagar.my_evaluator.evaluator import eval, is_error
 from waitress import serve
 from flask_cors import CORS
+import requests
+import threading
+import time
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/", methods=['GET'])
 def welcome():
@@ -36,7 +40,23 @@ def receive_data():
     except Exception as e:
         return jsonify({'Cannot evaluated code (probably an internal error)': e})
 
-CORS(app)
+@app.route("/ping", methods=["GET"])
+def ping():
+    return {"message": "pong"}, 200
+
+
+NODE_API_URL = "https://golmaal-x4f5.onrender.com/api/ping"
+
+def ping_node():
+    while True:
+        try:
+            requests.get(NODE_API_URL)
+            print("Pinged Node.js API")
+        except Exception as e:
+            print("Ping failed:", e)
+        time.sleep(300)  # 5 minutes
+
+threading.Thread(target=ping_node, daemon=True).start()
 
 if __name__ == '__main__':
     serve(app, host="0.0.0.0", port=8080)
