@@ -42,6 +42,7 @@ def receive_data():
 
 @app.route("/ping", methods=["GET"])
 def ping():
+    print("Someone pinged")
     return {"message": "pong"}, 200
 
 
