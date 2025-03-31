@@ -40,7 +40,7 @@ class Constants:
 
     # Keywords
     FUNCTION = "GOLMAAL"
-    LET = "JAADU"
+    LET = "MAAN_LE"
     RETURN = "YE_LO"
     TRUE = "TRUE"
     FALSE = "FALSE"
@@ -55,7 +55,7 @@ two_char_ops = {
 }
 
 keywords = {
-    'jaadu': Constants.LET,
+    'maan_le': Constants.LET,
     'golmaal': Constants.FUNCTION,
     'true': Constants.TRUE,
     'false': Constants.FALSE,

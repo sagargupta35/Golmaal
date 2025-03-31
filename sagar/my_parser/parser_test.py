@@ -9,9 +9,9 @@ class TestParser(unittest.TestCase):
     
     def test_let_statement(self):
         inp = '''
-            jaadu five = 5;
-            jaadu t = true;
-            jaadu foobar = y;
+            maan_le five = 5;
+            maan_le t = true;
+            maan_le foobar = y;
         '''
 
         l = new_lexer(inp)
@@ -29,7 +29,7 @@ class TestParser(unittest.TestCase):
             self.validate_let_statement(stmt, iden, exp)
 
     def validate_let_statement(self, stmt: Statement, iden: str, expected):
-        self.assertTrue(stmt.token_literal() == 'jaadu', f"Expected jaadu as token literal for stmt. But found {stmt.token_literal()}")
+        self.assertTrue(stmt.token_literal() == 'maan_le', f"Expected maan_le as token literal for stmt. But found {stmt.token_literal()}")
         self.assertTrue(isinstance(stmt, LetStatement), f"stmt is not instance of LetStatement. It is a {type(stmt)}")
         letstmt: LetStatement = stmt
         self.assertTrue(letstmt.name.token_literal() == iden, f"letstmt.name.token_literal() is not {iden}. Found {letstmt.name.token_literal()}")
@@ -535,11 +535,11 @@ class TestParser(unittest.TestCase):
 
     def test_while_stmt(self):
         inps = [
-            'jaadu x = 10; while(x){x = x-1;}',
-            'jaadu y = 5; while(y > 0){y = y - 1;}',
-            'jaadu z = 0; while(z < 3){z = z + 1;}',
-            'jaadu a = true; while(a){a = false;}',
-            'jaadu b = 0; while(b < 10){if(b == 5){b = b + 2;} else {b = b + 1;}}'
+            'maan_le x = 10; while(x){x = x-1;}',
+            'maan_le y = 5; while(y > 0){y = y - 1;}',
+            'maan_le z = 0; while(z < 3){z = z + 1;}',
+            'maan_le a = true; while(a){a = false;}',
+            'maan_le b = 0; while(b < 10){if(b == 5){b = b + 2;} else {b = b + 1;}}'
         ]
 
         for i, test in enumerate(inps):

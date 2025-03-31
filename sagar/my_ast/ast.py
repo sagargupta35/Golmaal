@@ -55,7 +55,7 @@ class LetStatement(Statement):
 
     def __str__(self) -> str:
         res: list[str] = []
-        res.append('jaadu')
+        res.append('maan_le')
         res.append(str(self.name))
         res.append('=')
         if self.value:

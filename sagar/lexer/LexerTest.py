@@ -6,12 +6,12 @@ class TestNextToken(unittest.TestCase):
 
     def test_next_token(self):
         input = '''
-            jaadu five = 5;
-            jaadu ten = 10;
-            jaadu add = golmaal(x, y) {
+            maan_le five = 5;
+            maan_le ten = 10;
+            maan_le add = golmaal(x, y) {
             x + y;
             };
-            jaadu result = add(five, ten);
+            maan_le result = add(five, ten);
             !-/*5;
             5 < 10 > 5;
             if (5 < 10) {
@@ -28,19 +28,19 @@ class TestNextToken(unittest.TestCase):
         con = Constants()
 
         tokens = [
-            (con.LET, "jaadu"),
+            (con.LET, "maan_le"),
             (con.IDENT, "five"),
             (con.ASSIGN, "="),
             (con.INT, "5"),
             (con.SEMICOLON, ";"),
 
-            (con.LET, "jaadu"),
+            (con.LET, "maan_le"),
             (con.IDENT, "ten"),
             (con.ASSIGN, "="),
             (con.INT, "10"),
             (con.SEMICOLON, ";"),
 
-            (con.LET, "jaadu"),
+            (con.LET, "maan_le"),
             (con.IDENT, "add"),
             (con.ASSIGN, "="),
             (con.FUNCTION, "golmaal"),
@@ -59,7 +59,7 @@ class TestNextToken(unittest.TestCase):
             (con.RBRACE, "}"),
             (con.SEMICOLON, ";"),
 
-            (con.LET, "jaadu"),
+            (con.LET, "maan_le"),
             (con.IDENT, "result"),
             (con.ASSIGN, "="),
             (con.IDENT, "add"),

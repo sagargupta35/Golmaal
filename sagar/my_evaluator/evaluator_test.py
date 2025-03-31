@@ -138,9 +138,9 @@ class TestEvaluator(unittest.TestCase):
 
     def test_let_statemtnts(self):
         inps = [
-            ('jaadu a = 5; a;', 5),
-            ('jaadu a = 10; jaadu b = 5; a+b;', 15),
-            ('jaadu a = 5; jaadu b = 6; jaadu c = a + b; c-10;', 1)
+            ('maan_le a = 5; a;', 5),
+            ('maan_le a = 10; maan_le b = 5; a+b;', 15),
+            ('maan_le a = 5; maan_le b = 6; maan_le c = a + b; c-10;', 1)
         ]
 
         for i, (inp, exp) in enumerate(inps):
@@ -163,11 +163,11 @@ class TestEvaluator(unittest.TestCase):
 
     def test_call_expression(self):
         inps = [
-            ("jaadu identity = golmaal(x) { x; }; identity(5);", 5),
-            ("jaadu identity = golmaal(x) { ye_lo x; }; identity(5);", 5),
-            ("jaadu double = golmaal(x) { x * 2; }; double(5);", 10),
-            ("jaadu add = golmaal(x, y) { x + y; }; add(5, 5);", 10),
-            ("jaadu add = golmaal(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20),
+            ("maan_le identity = golmaal(x) { x; }; identity(5);", 5),
+            ("maan_le identity = golmaal(x) { ye_lo x; }; identity(5);", 5),
+            ("maan_le double = golmaal(x) { x * 2; }; double(5);", 10),
+            ("maan_le add = golmaal(x, y) { x + y; }; add(5, 5);", 10),
+            ("maan_le add = golmaal(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20),
             ("golmaal(x) { x; }(5)", 5)
         ]
         for i, (inp, exp) in enumerate(inps):
@@ -218,22 +218,22 @@ class TestEvaluator(unittest.TestCase):
 
     def test_assignment_statement(self):
         inps = [
-            ('jaadu x = 10; x = 5; x;', 5),
-            ('jaadu x = 10; x = x + 5; x;', 15),
-            ('jaadu x = 10; jaadu y = 20; x = y; x;', 20),
-            ('jaadu x = 10; jaadu y = 20; x = y + 10; x;', 30),
-            ('jaadu x = 10; x = x * 2; x;', 20),
-            ('jaadu x = 10; if (x > 5) { x = 15; }; x;', 15),
-            ('jaadu x = 10; if (x < 5) { x = 15; } else { x = 20; }; x;', 20),
-            ('jaadu x = 10; jaadu y = 5; if (x > y) { x = x + y; }; x;', 15),
-            ('jaadu x = 10; x = x - 5; x;', 5),
-            ('jaadu x = 10; x = x / 2; x;', 5),
-            ('jaadu x = 10; x = x + 5 * 2; x;', 20),
-            ('jaadu x = 10; x = x + (5 * 2); x;', 20),
-            ('jaadu x = 10; x = x + (5 * 2) - 5; x;', 15),
-            ('jaadu x = 10; jaadu y = 5; x = x + y * 2; x;', 20),
-            ('jaadu x = 10; jaadu y = 5; x = x + (y * 2); x;', 20),
-            ('jaadu x = 10; jaadu y = 5; x = x + (y * 2) - y; x;', 15),
+            ('maan_le x = 10; x = 5; x;', 5),
+            ('maan_le x = 10; x = x + 5; x;', 15),
+            ('maan_le x = 10; maan_le y = 20; x = y; x;', 20),
+            ('maan_le x = 10; maan_le y = 20; x = y + 10; x;', 30),
+            ('maan_le x = 10; x = x * 2; x;', 20),
+            ('maan_le x = 10; if (x > 5) { x = 15; }; x;', 15),
+            ('maan_le x = 10; if (x < 5) { x = 15; } else { x = 20; }; x;', 20),
+            ('maan_le x = 10; maan_le y = 5; if (x > y) { x = x + y; }; x;', 15),
+            ('maan_le x = 10; x = x - 5; x;', 5),
+            ('maan_le x = 10; x = x / 2; x;', 5),
+            ('maan_le x = 10; x = x + 5 * 2; x;', 20),
+            ('maan_le x = 10; x = x + (5 * 2); x;', 20),
+            ('maan_le x = 10; x = x + (5 * 2) - 5; x;', 15),
+            ('maan_le x = 10; maan_le y = 5; x = x + y * 2; x;', 20),
+            ('maan_le x = 10; maan_le y = 5; x = x + (y * 2); x;', 20),
+            ('maan_le x = 10; maan_le y = 5; x = x + (y * 2) - y; x;', 15),
         ]
 
         for i, (inp, exp) in enumerate(inps):
@@ -242,20 +242,20 @@ class TestEvaluator(unittest.TestCase):
 
     def test_print_statements(self):
         tests = [
-            ('jaadu a = 10; print(a);', ['10']),
-            ('jaadu a = 10; jaadu b = 20; print(a, b);', ['10', '20']),
-            ('jaadu a = 10; jaadu b = 20; jaadu c = a + b; print(c);', ['30']),
+            ('maan_le a = 10; print(a);', ['10']),
+            ('maan_le a = 10; maan_le b = 20; print(a, b);', ['10', '20']),
+            ('maan_le a = 10; maan_le b = 20; maan_le c = a + b; print(c);', ['30']),
             ('print("Hello, World!");', ['Hello, World!']),
-            ('jaadu a = "Hello"; jaadu b = "World"; print(a + " " + b);', ['Hello World']),
-            ('jaadu a = [1, 2, 3]; print(a);', ['[1, 2, 3]']),
-            ('jaadu a = golmaal(x) { x * 2; }; print(a(5));', ['10']),
+            ('maan_le a = "Hello"; maan_le b = "World"; print(a + " " + b);', ['Hello World']),
+            ('maan_le a = [1, 2, 3]; print(a);', ['[1, 2, 3]']),
+            ('maan_le a = golmaal(x) { x * 2; }; print(a(5));', ['10']),
             ('if (true) { print("Condition is true"); }', ['Condition is true']),
             ('if (false) { print("Condition is false"); } else { print("Condition is true"); }', ['Condition is true']),
-            ('jaadu a = 10; if (a > 5) { print("a is greater than 5"); }', ['a is greater than 5']),
-            ('jaadu a = 10; jaadu b = 20; if (a < b) { print("a is less than b"); } else { print("a is not less than b"); }', ['a is less than b']),
-            ('jaadu a = 10; jaadu b = 20; print(a, b, a + b);', ['10', '20', '30']),
-            ('jaadu a = 10; jaadu b = 20; jaadu c = a * b; print(a, b, c);', ['10', '20', '200']),
-            ('jaadu a = 10; jaadu b = 20; jaadu c = a * b; print(a, b, c, c / a);', ['10', '20', '200', '20']),
+            ('maan_le a = 10; if (a > 5) { print("a is greater than 5"); }', ['a is greater than 5']),
+            ('maan_le a = 10; maan_le b = 20; if (a < b) { print("a is less than b"); } else { print("a is not less than b"); }', ['a is less than b']),
+            ('maan_le a = 10; maan_le b = 20; print(a, b, a + b);', ['10', '20', '30']),
+            ('maan_le a = 10; maan_le b = 20; maan_le c = a * b; print(a, b, c);', ['10', '20', '200']),
+            ('maan_le a = 10; maan_le b = 20; maan_le c = a * b; print(a, b, c, c / a);', ['10', '20', '200', '20']),
         ]
 
         for i, (test, exp) in enumerate(tests):
@@ -270,13 +270,13 @@ class TestEvaluator(unittest.TestCase):
 
     def test_while_statement(self):
         tests = [
-            'jaadu x = 10; while(x){x = x-1;}; print(x);',
-            'jaadu x = 5; jaadu y = 0; while(x){y = y + x; x = x - 1;}; print(y);',
-            'jaadu x = 0; while(x < 5){x = x + 1;}; print(x);',
-            'jaadu x = 10; jaadu y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, y);',
-            'jaadu x = 3; jaadu y = 1; while(x > 0){y = y * x; x = x - 1;}; print(y);',
-            'jaadu x = 10; while(x > 0){if(x == 5){break;}; x = x - 1;}; print(x);',
-            'jaadu x = 10; jaadu y = 0; while(x > 0){if(x == 5){x = x - 1; continue;}; y = y + x; x = x - 1;}; print(y);',
+            'maan_le x = 10; while(x){x = x-1;}; print(x);',
+            'maan_le x = 5; maan_le y = 0; while(x){y = y + x; x = x - 1;}; print(y);',
+            'maan_le x = 0; while(x < 5){x = x + 1;}; print(x);',
+            'maan_le x = 10; maan_le y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, y);',
+            'maan_le x = 3; maan_le y = 1; while(x > 0){y = y * x; x = x - 1;}; print(y);',
+            'maan_le x = 10; while(x > 0){if(x == 5){break;}; x = x - 1;}; print(x);',
+            'maan_le x = 10; maan_le y = 0; while(x > 0){if(x == 5){x = x - 1; continue;}; y = y + x; x = x - 1;}; print(y);',
         ]
         expected_outputs = [
             ['0'],
@@ -305,17 +305,17 @@ class TestEvaluator(unittest.TestCase):
 
     def test_index_expression(self):
         tests = [
-            'jaadu x = 10; while(x > 0){x = x-1;}; jaadu arr = [1, 2, 3]; print(arr[x])',
-            'jaadu arr = [1, 2, 3, 4, 5]; print(arr[0])',
-            'jaadu arr = [1, 2, 3, 4, 5]; print(arr[4])',
-            'jaadu arr = [1, 2, 3, 4, 5]; print(arr[2])',
-            'jaadu arr = [1, 2, 3]; jaadu idx = 1; print(arr[idx])',
-            'jaadu arr = [1, 2, 3]; jaadu idx = 2; print(arr[idx])',
-            'jaadu arr = [1, 2, 3]; print(arr[3])',  # Out of bounds
-            'jaadu arr = [1, 2, 3]; print(arr[-1])',  # Negative index
-            'jaadu arr = [1, 2, 3]; jaadu idx = "1"; print(arr[idx])',  # Invalid index type
-            'jaadu arr = []; print(arr[0])',  # Empty array
-            'jaadu x = 10; print(x[3])' # Invalid array type
+            'maan_le x = 10; while(x > 0){x = x-1;}; maan_le arr = [1, 2, 3]; print(arr[x])',
+            'maan_le arr = [1, 2, 3, 4, 5]; print(arr[0])',
+            'maan_le arr = [1, 2, 3, 4, 5]; print(arr[4])',
+            'maan_le arr = [1, 2, 3, 4, 5]; print(arr[2])',
+            'maan_le arr = [1, 2, 3]; maan_le idx = 1; print(arr[idx])',
+            'maan_le arr = [1, 2, 3]; maan_le idx = 2; print(arr[idx])',
+            'maan_le arr = [1, 2, 3]; print(arr[3])',  # Out of bounds
+            'maan_le arr = [1, 2, 3]; print(arr[-1])',  # Negative index
+            'maan_le arr = [1, 2, 3]; maan_le idx = "1"; print(arr[idx])',  # Invalid index type
+            'maan_le arr = []; print(arr[0])',  # Empty array
+            'maan_le x = 10; print(x[3])' # Invalid array type
         ]
         exp = [
             ['1'],
