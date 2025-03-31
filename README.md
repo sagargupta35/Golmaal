@@ -3,18 +3,17 @@
 ## Data types
 1. **Integers**: `10, 20, -10`
 2. **Booleans** `true, false`
-3. **Strings**: `"golmaal", "is fun"`
+3. **Strings**: `"golmaal", "is fun"`, `2 + " two"`
 4. **Arrays**: `[1, false, "golmaal"] // arrays are immutable`
 
 ## Variable Declaration
-`jaadu a = 10;`
-
-`a = false;` **(re-assignment is allowed only if you have already declared the variable)**
-
+variables are declared using the `maan_le` keyword <br>
+`maan_le a = 10;`<br>
+`a = false;` **(re-assignment is allowed only if you have already declared the variable)**<br>
 `jaadu b = [1, false, golmaal(a){ye_lo a*2}]`
 
 ##  Built-in functions
-1. `print(2, 3, false)` multiple arguements are printed line by line
+1. `print(2, 3, false)` // multiple arguements are concatenated with '' as delimiter
 2. `len("Golmaal") // 7`
 3. `len([1, 2, 3]) // 3` 
 
@@ -42,6 +41,7 @@ while(a){
 
 ## Functions:
 #### Functions are also expressions in Golmaal.
+###### `golmaal` keyword is used to define functions
 ```
 jaadu a = golmaal(a, b){
 	ye_lo a + b*2;
@@ -52,6 +52,7 @@ note that ye_lo keyword is optional
 <br>
 
 ## Closures:
+[What is a Closure?](https://stackoverflow.com/questions/36636/what-is-a-closure)
 ```
 jaadu a = golmaal(a, b){
 	ye_lo a + b*2;
@@ -63,4 +64,4 @@ jaadu b = golmaal(a, b){
 print(b(2, a)); // prints 21
 ```
 
-[Click to know more](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[Try it on our website](https://golmaal-front-end.onrender.com)

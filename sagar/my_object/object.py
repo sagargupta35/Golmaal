@@ -63,6 +63,8 @@ class NullObj(Object):
     def inspect(self):
         return 'NULL'
     
+    def __str__(self):
+        return self.inspect()
 
 class ReturnObj(Object):
 
@@ -74,6 +76,9 @@ class ReturnObj(Object):
 
     def inspect(self):
         return self.value.inspect()
+    
+    def __str__(self):
+        return self.inspect()
 
 class ErrorObj(Object):
     def __init__(self, message: str = ''):
@@ -84,6 +89,9 @@ class ErrorObj(Object):
     
     def inspect(self):
         return self.message
+
+    def __str__(self):
+        return f"Error: {self.message}"
     
 class Environment:
     def __init__(self, outer: Environment | None = None, print_statements: list[str] | None = None ):
@@ -111,7 +119,7 @@ class Environment:
     
     def print(self, obj) -> bool:
         if self.print_statements is not None:
-            self.print_statements.append(obj.inspect())
+            self.print_statements.append(obj)
             if len(self.print_statements) == 1000:
                 return True
         else:
@@ -162,6 +170,9 @@ class Builtin:
     
     def inspect(self):
         return f"Builtin function : {self.name}"
+    
+    def __str__(self):
+        return self.inspect()
 
 class BuiltinKeywordFunction:
     def __init__(self, name):
@@ -169,6 +180,9 @@ class BuiltinKeywordFunction:
     
     def inspect(self):
         return f"Builtin Keyword Function: {self.name}"
+    
+    def __str__(self):
+        return self.inspect()
 
 def null_function(*args):
     return NullObj()

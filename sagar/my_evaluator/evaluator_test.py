@@ -175,8 +175,8 @@ class TestEvaluator(unittest.TestCase):
             self.validate_integer_obj(evaluated, value=exp, idx=i)
 
     def test_string_objects(self):
-        inps = ['"om sai ram";', '"sagar gupta";', '"foobar"', '"om sai" + " " + "ram"', '"sagar" + ""', '"sagar " + "gupta"']
-        exp = ['om sai ram', 'sagar gupta', 'foobar', 'om sai ram', 'sagar', 'sagar gupta']
+        inps = ['"om sai ram";', '"sagar gupta";', '"foobar"', '"om sai" + " " + "ram"', '"sagar" + ""', '"sagar " + "gupta"', '2 + "sagar"', 'false + "true"', '"test" + golmaal(a, b){a*b}']
+        exp = ['om sai ram', 'sagar gupta', 'foobar', 'om sai ram', 'sagar', 'sagar gupta', '2sagar', 'Falsetrue', "testgolmaal ( a, b ) { (a * b) }"]
         for i, inp in enumerate(inps):
             evaluated = self.get_eval(inp)
             self.assertTrue(isinstance(evaluated, StringObj), f'evaluated -> {i} is not an instance of StringObj. Its a {type(evaluated)}')
@@ -243,7 +243,7 @@ class TestEvaluator(unittest.TestCase):
     def test_print_statements(self):
         tests = [
             ('maan_le a = 10; print(a);', ['10']),
-            ('maan_le a = 10; maan_le b = 20; print(a, b);', ['10', '20']),
+            ('maan_le a = 10; maan_le b = 20; print(a, b);', ['1020']),
             ('maan_le a = 10; maan_le b = 20; maan_le c = a + b; print(c);', ['30']),
             ('print("Hello, World!");', ['Hello, World!']),
             ('maan_le a = "Hello"; maan_le b = "World"; print(a + " " + b);', ['Hello World']),
@@ -253,9 +253,9 @@ class TestEvaluator(unittest.TestCase):
             ('if (false) { print("Condition is false"); } else { print("Condition is true"); }', ['Condition is true']),
             ('maan_le a = 10; if (a > 5) { print("a is greater than 5"); }', ['a is greater than 5']),
             ('maan_le a = 10; maan_le b = 20; if (a < b) { print("a is less than b"); } else { print("a is not less than b"); }', ['a is less than b']),
-            ('maan_le a = 10; maan_le b = 20; print(a, b, a + b);', ['10', '20', '30']),
-            ('maan_le a = 10; maan_le b = 20; maan_le c = a * b; print(a, b, c);', ['10', '20', '200']),
-            ('maan_le a = 10; maan_le b = 20; maan_le c = a * b; print(a, b, c, c / a);', ['10', '20', '200', '20']),
+            ('maan_le a = 10; maan_le b = 20; print(a, " ",  b, " ", a + b);', ['10 20 30']),
+            ('maan_le a = 10; maan_le b = 20; maan_le c = a * b; print(a, b, c);', ['1020200']),
+            ('maan_le a = 10; maan_le b = 20; maan_le c = a * b; print(a, b, c, c / a);', ['102020020']),
         ]
 
         for i, (test, exp) in enumerate(tests):
@@ -273,7 +273,7 @@ class TestEvaluator(unittest.TestCase):
             'maan_le x = 10; while(x){x = x-1;}; print(x);',
             'maan_le x = 5; maan_le y = 0; while(x){y = y + x; x = x - 1;}; print(y);',
             'maan_le x = 0; while(x < 5){x = x + 1;}; print(x);',
-            'maan_le x = 10; maan_le y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, y);',
+            'maan_le x = 10; maan_le y = 0; while(x > 5){y = y + x; x = x - 1;}; print(x, " ", y);',
             'maan_le x = 3; maan_le y = 1; while(x > 0){y = y * x; x = x - 1;}; print(y);',
             'maan_le x = 10; while(x > 0){if(x == 5){break;}; x = x - 1;}; print(x);',
             'maan_le x = 10; maan_le y = 0; while(x > 0){if(x == 5){x = x - 1; continue;}; y = y + x; x = x - 1;}; print(y);',
@@ -282,7 +282,7 @@ class TestEvaluator(unittest.TestCase):
             ['0'],
             ['15'],
             ['5'],
-            ['5', '40'],
+            ['5 40'],
             ['6'],
             ['5'],
             ['50'],

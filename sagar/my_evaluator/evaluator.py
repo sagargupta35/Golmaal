@@ -25,11 +25,11 @@ def __print(args: list[Object], **kwargs) -> NullObj | ErrorObj:
         return ErrorObj('no environment found to print')
     if not isinstance(env, Environment):
         return ErrorObj('no environment found to print')
-    overload = False
+    res = []
     for obj in args:
-        overload = env.print(obj)
-        if overload:
-            break
+        res.append(str(obj))
+    res = ''.join(res)
+    overload = env.print(res)
     if overload:
         return ErrorObj('Cannot print more than 1000 statements currently.')
     return NullObj()
@@ -254,6 +254,9 @@ def eval_infix_expression(operator: str, left: Object, right: Object) -> Object:
         
         if is_error(right):
             return right
+        
+        if isinstance(left, StringObj) or isinstance(right, StringObj):
+            return StringObj(value=str(left) + str(right))
 
         # handle non integer cases
         if type(left) != type(right):
